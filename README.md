@@ -1,0 +1,1 @@
+# affitti-smart
