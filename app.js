@@ -61,6 +61,8 @@ const mySearches =
 const newSearchFromDashboard =
   document.getElementById("newSearchFromDashboard");
 
+const advancedMore =
+  document.querySelector(".advanced-more");
 
 let currentStep = 1;
 
@@ -238,7 +240,25 @@ if (newSearchFromDashboard) {
   );
 
 }
+advancedMore.addEventListener(
+  "toggle",
+  () => {
 
+    if (advancedMore.open) {
+
+      setTimeout(() => {
+
+        advancedMore.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+      }, 120);
+
+    }
+
+  }
+);
 
 /* =========================
    SCROLL HOME
