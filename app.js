@@ -463,6 +463,16 @@ function populatePoiOptions() {
   });
 if (options.length === 0) {
 
+  const oldHelp =
+    poiResults.querySelector(
+      ".poi-demo-help"
+    );
+
+  if (oldHelp) {
+    oldHelp.remove();
+  }
+
+
   const option =
     document.createElement(
       "option"
@@ -471,13 +481,45 @@ if (options.length === 0) {
   option.value = "";
 
   option.textContent =
-    "Nessun suggerimento disponibile nella demo";
+    "Nessun suggerimento disponibile nella demo per questa categoria";
 
   poiSelect.appendChild(
     option
   );
 
+
+  const help =
+    document.createElement(
+      "small"
+    );
+
+  help.className =
+    "poi-demo-help";
+
+  help.textContent =
+    "Puoi comunque inserire una scuola, un indirizzo o una zona nel campo sopra.";
+
+  help.style.display =
+    "block";
+
+  help.style.marginTop =
+    "8px";
+
+  help.style.color =
+    "#70827e";
+
+  help.style.fontWeight =
+    "500";
+
+  help.style.lineHeight =
+    "1.4";
+
+  poiResults.appendChild(
+    help
+  );
+
 }
+
  poiResults.hidden = false;
 
 distanceBlock.hidden = true;
