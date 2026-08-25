@@ -1,26 +1,43 @@
 <!doctype html>
 <html lang="it">
+
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
   <meta
     name="description"
     content="Affitti Smart organizza la tua ricerca casa: annunci, chiamate, note, visite e possibili duplicati."
   >
 
-  <meta name="theme-color" content="#0d6b5f">
+  <meta
+    name="theme-color"
+    content="#0d6b5f"
+  >
 
-  <title>Affitti Smart</title>
+  <title>
+    Affitti Smart
+  </title>
 
-  <link rel="stylesheet" href="styles.css">
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
 </head>
+
 
 <body>
 
 <header class="site-header">
 
-  <a class="brand" href="#">
+  <a
+    class="brand"
+    href="#"
+  >
 
     <span class="brand-mark">
       A
@@ -32,14 +49,8 @@
 
   </a>
 
-  <div class="header-actions">
 
-    <button
-      class="login-button"
-      type="button"
-    >
-      Accedi
-    </button>
+  <div class="header-actions">
 
     <button
       class="primary small"
@@ -54,9 +65,12 @@
 </header>
 
 
+
 <main>
 
-  <!-- HERO -->
+  <!-- =========================
+       HERO
+  ========================== -->
 
   <section class="hero">
 
@@ -65,6 +79,7 @@
       <div class="hero-label">
         La ricerca casa, finalmente organizzata
       </div>
+
 
       <h1>
         Non chiamare due volte
@@ -75,12 +90,14 @@
         </span>
       </h1>
 
+
       <p class="hero-description">
         Affitti Smart organizza la tua ricerca:
         nuovi annunci, preferiti, note,
         chiamate, richiami, visite e possibili
         doppioni, tutto in un unico posto.
       </p>
+
 
       <div class="hero-buttons">
 
@@ -92,6 +109,7 @@
           Provalo gratis
         </button>
 
+
         <button
           class="secondary"
           id="discoverButton"
@@ -101,6 +119,7 @@
         </button>
 
       </div>
+
 
       <div class="hero-notes">
 
@@ -118,10 +137,29 @@
 
       </div>
 
+
+      <button
+        class="scroll-hint"
+        id="scrollHint"
+        type="button"
+        aria-label="Scopri cosa puoi fare con Affitti Smart"
+      >
+        <span>
+          Scopri cosa puoi fare
+        </span>
+
+        <span class="scroll-arrow">
+          ↓
+        </span>
+      </button>
+
     </div>
 
 
-    <!-- MOCKUP APP -->
+
+    <!-- =========================
+         MOCKUP APP
+    ========================== -->
 
     <div class="phone">
 
@@ -240,7 +278,10 @@
   </section>
 
 
-  <!-- COSA FA -->
+
+  <!-- =========================
+       COSA FA
+  ========================== -->
 
   <section
     class="section"
@@ -259,11 +300,9 @@
       </h2>
 
       <p>
-        Affitti Smart non vuole essere
-        un altro portale immobiliare.
-
-        Ti aiuta a gestire in modo
-        organizzato tutto quello che trovi.
+        Affitti Smart ti aiuta a gestire
+        in un unico posto annunci,
+        chiamate, note, preferiti e visite.
       </p>
 
     </div>
@@ -383,7 +422,10 @@
   </section>
 
 
-  <!-- RICERCA GUIDATA -->
+
+  <!-- =========================
+       RICERCA GUIDATA
+  ========================== -->
 
   <section class="section soft">
 
@@ -417,8 +459,8 @@
         </h3>
 
         <p>
-          Città, zona o punto di interesse
-          e distanza massima.
+          Città, indirizzo, zona
+          o punto di interesse.
         </p>
 
       </article>
@@ -433,7 +475,8 @@
         </h3>
 
         <p>
-          Stanza, monolocale o appartamento.
+          Stanza, monolocale
+          o appartamento.
         </p>
 
       </article>
@@ -475,7 +518,61 @@
   </section>
 
 
-  <!-- BETA -->
+
+  <!-- =========================
+       LE MIE RICERCHE
+  ========================== -->
+
+  <section
+    class="section my-searches-section"
+    id="mySearches"
+    hidden
+  >
+
+    <div class="my-searches-header">
+
+      <div>
+
+        <span class="eyebrow">
+          Le mie ricerche
+        </span>
+
+        <h2>
+          Le tue ricerche attive
+        </h2>
+
+        <p>
+          Qui trovi le ricerche che hai creato
+          e puoi modificarle quando vuoi.
+        </p>
+
+      </div>
+
+
+      <button
+        class="primary"
+        id="newSearchFromDashboard"
+        type="button"
+      >
+        + Nuova ricerca
+      </button>
+
+    </div>
+
+
+    <div
+      class="saved-searches"
+      id="savedSearches"
+    >
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================
+       BETA
+  ========================== -->
 
   <section
     class="beta-section"
@@ -578,6 +675,7 @@
         Voglio provarlo
       </button>
 
+
       <small id="betaMessage">
         Nessun pagamento richiesto.
       </small>
@@ -587,6 +685,7 @@
   </section>
 
 </main>
+
 
 
 <footer>
@@ -611,447 +710,742 @@
 
 
 
-<!-- MODALE NUOVA RICERCA -->
+
+<!-- =========================
+     MODALE NUOVA RICERCA
+========================== -->
 
 <dialog id="searchDialog">
 
   <form id="searchWizard">
 
-    <div class="dialog-header">
+    <div class="wizard-fixed-header">
 
-      <div>
+      <div class="dialog-header">
 
-        <span class="eyebrow">
-          Nuova ricerca
-        </span>
+        <div>
 
-        <h2 id="wizardTitle">
-          Dove cerchi?
-        </h2>
+          <span class="eyebrow">
+            Nuova ricerca
+          </span>
 
-      </div>
-
-      <button
-        type="button"
-        id="closeDialog"
-        class="close-button"
-      >
-        ×
-      </button>
-
-    </div>
-
-
-    <div class="progress">
-
-      <span id="progressBar">
-      </span>
-
-    </div>
-
-
-
-    <!-- STEP 1 -->
-
-    <section
-      class="wizard-step active"
-      data-step="1"
-    >
-
-      <label>
-
-        Città
-
-        <input
-          name="searchCity"
-          placeholder="Es. Prato"
-          required
-        >
-
-      </label>
-
-
-      <label>
-
-        Zona o punto di interesse
-
-        <input
-          name="poi"
-          placeholder="Es. Parco Prato"
-        >
-
-      </label>
-
-
-      <label>
-
-        Distanza massima
-
-        <select name="distance">
-
-          <option value="1">
-            1 km
-          </option>
-
-          <option value="2">
-            2 km
-          </option>
-
-          <option value="5">
-            5 km
-          </option>
-
-          <option value="10">
-            10 km
-          </option>
-
-        </select>
-
-      </label>
-
-    </section>
-
-
-
-    <!-- STEP 2 -->
-
-    <section
-      class="wizard-step"
-      data-step="2"
-    >
-
-      <div class="choice-grid">
-
-        <button
-          type="button"
-          class="property-choice active"
-          data-type="Stanza"
-        >
-          Stanza
-        </button>
-
-
-        <button
-          type="button"
-          class="property-choice"
-          data-type="Monolocale"
-        >
-          Monolocale
-        </button>
-
-
-        <button
-          type="button"
-          class="property-choice"
-          data-type="Appartamento"
-        >
-          Appartamento
-        </button>
-
-      </div>
-
-
-
-      <!-- FILTRI SPECIFICI STANZA -->
-
-      <div
-        class="room-filters"
-        id="roomFilters"
-      >
-
-        <h3>
-          Per la stanza puoi selezionare:
-        </h3>
-
-
-        <div class="checkbox-grid">
-
-          <label class="checkbox">
-            <input
-              type="checkbox"
-              name="womenOnly"
-            >
-            Solo donne
-          </label>
-
-
-          <label class="checkbox">
-            <input
-              type="checkbox"
-              name="menOnly"
-            >
-            Solo uomini
-          </label>
-
-
-          <label class="checkbox">
-            <input
-              type="checkbox"
-              name="mixed"
-            >
-            Coinquilini misti
-          </label>
-
-
-          <label class="checkbox">
-            <input
-              type="checkbox"
-              name="privateBathroom"
-            >
-            Bagno privato
-          </label>
-
-
-          <label class="checkbox">
-            <input
-              type="checkbox"
-              name="petFriendly"
-            >
-            Pet friendly
-          </label>
-
-
-          <label class="checkbox">
-            <input
-              type="checkbox"
-              name="couplesAllowed"
-            >
-            Coppie ammesse
-          </label>
+          <h2 id="wizardTitle">
+            Dove cerchi?
+          </h2>
 
         </div>
 
+
+        <button
+          type="button"
+          id="closeDialog"
+          class="close-button"
+          aria-label="Chiudi"
+        >
+          ×
+        </button>
+
       </div>
 
-    </section>
+
+      <div class="progress">
+
+        <span id="progressBar">
+        </span>
+
+      </div>
+
+    </div>
 
 
 
-    <!-- STEP 3 -->
-
-    <section
-      class="wizard-step"
-      data-step="3"
-    >
-
-      <label>
-
-        Budget massimo al mese
-
-        <input
-          name="budget"
-          type="number"
-          min="0"
-          step="50"
-          placeholder="Es. 550"
-        >
-
-      </label>
+    <div class="wizard-content">
 
 
-      <label>
+      <!-- =========================
+           STEP 1
+      ========================== -->
 
-        Disponibile da
+      <section
+        class="wizard-step active"
+        data-step="1"
+      >
 
-        <input
-          name="availableFrom"
-          type="date"
-        >
+        <label>
 
-      </label>
+          Città
 
+          <input
+            name="searchCity"
+            placeholder="Es. Prato"
+            autocomplete="address-level2"
+            required
+          >
 
-      <label>
-
-        Durata desiderata
-
-        <select name="duration">
-
-          <option>
-            Indifferente
-          </option>
-
-          <option>
-            1–3 mesi
-          </option>
-
-          <option>
-            3–6 mesi
-          </option>
-
-          <option>
-            6–12 mesi
-          </option>
-
-          <option>
-            Oltre 12 mesi
-          </option>
-
-        </select>
-
-      </label>
-
-    </section>
+        </label>
 
 
-
-    <!-- STEP 4 -->
-
-    <section
-      class="wizard-step"
-      data-step="4"
-    >
-
-      <details>
-
-        <summary>
-          Ricerca avanzata
-        </summary>
-
-
-        <div class="checkbox-grid advanced">
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Arredato
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Utenze incluse
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Wi-Fi incluso
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Solo privati
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            No commissioni agenzia
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Balcone / terrazzo
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Ascensore
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Posto auto / garage
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Aria condizionata
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Lavatrice
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            Lavastoviglie
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            No piano terra
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox">
-            No seminterrato
-          </label>
-
+        <div class="location-separator">
+          Poi puoi restringere la zona
         </div>
 
 
         <label>
 
-          Tipo di contratto
+          Indirizzo o zona specifica
 
-          <select>
+          <input
+            name="addressZone"
+            placeholder="Es. Via Roma 25 oppure zona Stazione"
+          >
 
-            <option>
+          <small class="field-help">
+            Puoi scrivere liberamente una via,
+            un indirizzo o il nome di una zona.
+          </small>
+
+        </label>
+
+
+        <div class="poi-block">
+
+          <div class="poi-heading">
+
+            <strong>
+              Oppure scegli un punto di interesse
+            </strong>
+
+            <small>
+              Ti mostreremo quelli disponibili
+              nella città selezionata.
+            </small>
+
+          </div>
+
+
+          <div
+            class="poi-categories"
+            id="poiCategories"
+          >
+
+            <button
+              class="poi-category"
+              type="button"
+              data-poi-category="Stazione"
+            >
+              🚉 Stazione
+            </button>
+
+
+            <button
+              class="poi-category"
+              type="button"
+              data-poi-category="Università"
+            >
+              🎓 Università
+            </button>
+
+
+            <button
+              class="poi-category"
+              type="button"
+              data-poi-category="Ospedale"
+            >
+              🏥 Ospedale
+            </button>
+
+
+            <button
+              class="poi-category"
+              type="button"
+              data-poi-category="Centro commerciale"
+            >
+              🛍 Centro commerciale
+            </button>
+
+
+            <button
+              class="poi-category"
+              type="button"
+              data-poi-category="Parco"
+            >
+              🌳 Parco
+            </button>
+
+
+            <button
+              class="poi-category"
+              type="button"
+              data-poi-category="Scuola"
+            >
+              🏫 Scuola
+            </button>
+
+          </div>
+
+
+          <div
+            class="poi-results"
+            id="poiResults"
+            hidden
+          >
+
+            <label>
+
+              Punto di interesse
+
+              <select name="poi">
+
+                <option value="">
+                  Seleziona
+                </option>
+
+              </select>
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="distance-block"
+          id="distanceBlock"
+          hidden
+        >
+
+          <label>
+
+            Quanto vuoi restare vicino?
+
+            <select name="distance">
+
+              <option value="1">
+                Entro 1 km
+              </option>
+
+              <option value="2">
+                Entro 2 km
+              </option>
+
+              <option
+                value="5"
+                selected
+              >
+                Entro 5 km
+              </option>
+
+              <option value="10">
+                Entro 10 km
+              </option>
+
+            </select>
+
+          </label>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================
+           STEP 2
+      ========================== -->
+
+      <section
+        class="wizard-step"
+        data-step="2"
+      >
+
+        <div class="choice-grid">
+
+          <button
+            type="button"
+            class="property-choice active"
+            data-type="Stanza"
+          >
+            Stanza
+          </button>
+
+
+          <button
+            type="button"
+            class="property-choice"
+            data-type="Monolocale"
+          >
+            Monolocale
+          </button>
+
+
+          <button
+            type="button"
+            class="property-choice"
+            data-type="Appartamento"
+          >
+            Appartamento
+          </button>
+
+        </div>
+
+
+
+        <div class="general-property-filters">
+
+          <h3>
+            Preferenze
+          </h3>
+
+
+          <div class="checkbox-grid">
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="petFriendly"
+              >
+
+              Animali ammessi
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="furnished"
+              >
+
+              Arredato
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- FILTRI STANZA -->
+
+        <div
+          class="room-filters"
+          id="roomFilters"
+        >
+
+          <h3>
+            Per la stanza puoi selezionare:
+          </h3>
+
+
+          <div class="checkbox-grid">
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="womenOnly"
+              >
+
+              Solo donne
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="menOnly"
+              >
+
+              Solo uomini
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="mixed"
+              >
+
+              Coinquilini misti
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="privateBathroom"
+              >
+
+              Bagno privato
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="couplesAllowed"
+              >
+
+              Coppie ammesse
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================
+           STEP 3
+      ========================== -->
+
+      <section
+        class="wizard-step"
+        data-step="3"
+      >
+
+        <label>
+
+          Budget massimo al mese
+
+          <input
+            name="budget"
+            type="number"
+            min="0"
+            step="50"
+            placeholder="Es. 550"
+          >
+
+        </label>
+
+
+        <label>
+
+          Disponibile da
+
+          <input
+            name="availableFrom"
+            type="date"
+          >
+
+        </label>
+
+
+        <label>
+
+          Durata desiderata
+
+          <select name="duration">
+
+            <option value="">
               Indifferente
             </option>
 
-            <option>
-              Transitorio
+            <option value="1-3 mesi">
+              1 - 3 mesi
             </option>
 
-            <option>
-              Studenti
+            <option value="3-6 mesi">
+              3 - 6 mesi
             </option>
 
-            <option>
-              3+2
+            <option value="6-12 mesi">
+              6 - 12 mesi
             </option>
 
-            <option>
-              4+4
+            <option value="Oltre 12 mesi">
+              Oltre 12 mesi
             </option>
 
           </select>
 
         </label>
 
-      </details>
-
-    </section>
+      </section>
 
 
 
-    <!-- STEP 5 -->
+      <!-- =========================
+           STEP 4
+      ========================== -->
 
-    <section
-      class="wizard-step"
-      data-step="5"
-    >
-
-      <div
-        class="search-summary"
-        id="searchSummary"
+      <section
+        class="wizard-step"
+        data-step="4"
       >
-      </div>
 
-      <p class="summary-note">
-        Potrai modificare i filtri
-        anche dopo.
-      </p>
-
-    </section>
+        <p class="advanced-intro">
+          Se vuoi puoi aggiungere altri filtri.
+          Puoi anche saltare questo passaggio.
+        </p>
 
 
+        <div class="advanced-main">
 
-    <div class="wizard-buttons">
+          <h3>
+            Filtri principali
+          </h3>
+
+
+          <div class="checkbox-grid">
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="utilitiesIncluded"
+              >
+
+              Utenze incluse
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="privateOnly"
+              >
+
+              Solo privati
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="noAgencyFees"
+              >
+
+              No commissioni agenzia
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="balcony"
+              >
+
+              Balcone / terrazzo
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="elevator"
+              >
+
+              Ascensore
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="parking"
+              >
+
+              Posto auto / garage
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+
+        <details class="advanced-more">
+
+          <summary>
+            Altri filtri
+          </summary>
+
+
+          <div class="checkbox-grid advanced">
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="airConditioning"
+              >
+
+              Aria condizionata
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="washingMachine"
+              >
+
+              Lavatrice
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="dishwasher"
+              >
+
+              Lavastoviglie
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="wifiIncluded"
+              >
+
+              Wi-Fi incluso
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="noGroundFloor"
+              >
+
+              No piano terra
+
+            </label>
+
+
+            <label class="checkbox">
+
+              <input
+                type="checkbox"
+                name="noBasement"
+              >
+
+              No seminterrato
+
+            </label>
+
+          </div>
+
+        </details>
+
+
+
+        <label>
+
+          Tipo di contratto
+
+          <select name="contractType">
+
+            <option value="">
+              Indifferente
+            </option>
+
+            <option value="Transitorio">
+              Transitorio
+            </option>
+
+            <option value="Studenti">
+              Studenti
+            </option>
+
+            <option value="3+2">
+              3 + 2
+            </option>
+
+            <option value="4+4">
+              4 + 4
+            </option>
+
+          </select>
+
+        </label>
+
+      </section>
+
+
+
+      <!-- =========================
+           STEP 5
+      ========================== -->
+
+      <section
+        class="wizard-step"
+        data-step="5"
+      >
+
+        <div
+          class="search-summary"
+          id="searchSummary"
+        >
+        </div>
+
+
+        <p class="summary-note">
+          Potrai modificare i filtri anche dopo.
+        </p>
+
+      </section>
+
+    </div>
+
+
+
+    <!-- =========================
+         PULSANTI FISSI WIZARD
+    ========================== -->
+
+    <div class="wizard-buttons wizard-fixed-buttons">
 
       <button
-        type="button"
         class="secondary"
         id="previousButton"
+        type="button"
       >
         Indietro
       </button>
 
 
       <button
-        type="button"
         class="primary"
         id="nextButton"
+        type="button"
       >
         Continua
       </button>
@@ -1063,7 +1457,9 @@
 </dialog>
 
 
+
 <script src="app.js"></script>
 
 </body>
+
 </html>
