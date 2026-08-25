@@ -490,7 +490,7 @@ if (options.length === 0) {
   message.innerHTML =
     "<strong>Nessun suggerimento demo per questa categoria.</strong><br>" +
     "Questo non significa che il luogo non esista. " +
-    "Puoi inserire liberamente il nome di una scuola, un indirizzo o una zona nel campo sopra.";
+    "Puoi inserire liberamente un indirizzo, una zona o un punto di riferimento nel campo sopra.";
 
   message.style.padding =
     "12px 14px";
