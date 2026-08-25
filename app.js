@@ -2,6 +2,8 @@ const STORAGE_KEY = "affitti-smart-listings";
 
 let listings = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 let currentView = "all";
+let currentPhotoHash = "";
+let currentPhotoPreview = "";
 
 const openAdd = document.getElementById("openAdd");
 const closeAdd = document.getElementById("closeAdd");
@@ -20,6 +22,10 @@ const countGroups = document.getElementById("countGroups");
 const countFavs = document.getElementById("countFavs");
 
 const navItems = document.querySelectorAll(".nav-item");
+
+const photoInput = document.getElementById("photoInput");
+const photoPreview = document.getElementById("photoPreview");
+const photoPreviewImage = document.getElementById("photoPreviewImage");
 
 function saveListings() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(listings));
@@ -50,42 +56,216 @@ function similarity(a, b) {
   let common = 0;
 
   wordsA.forEach(word => {
-    if (wordsB.has(word)) common++;
+    if (wordsB.has(word)) {
+      common++;
+    }
   });
 
   return common / Math.max(wordsA.size, wordsB.size);
 }
 
+function hammingSimilarity(hashA, hashB) {
+  if (!hashA || !hashB) return 0;
+  if (hashA.length !== hashB.length) return 0;
+
+  let equal = 0;
+
+  for (let i = 0; i < hashA.length; i++) {
+    if (hashA[i] === hashB[i]) {
+      equal++;
+    }
+  }
+
+  return equal / hashA.length;
+}
+
+function createImageHash(image) {
+  const size = 16;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d", {
+    willReadFrequently: true
+  });
+
+  ctx.drawImage(image, 0, 0, size, size);
+
+  const imageData = ctx.getImageData(
+    0,
+    0,
+    size,
+    size
+  ).data;
+
+  const grayscale = [];
+
+  for (let i = 0; i < imageData.length; i += 4) {
+    const r = imageData[i];
+    const g = imageData[i + 1];
+    const b = imageData[i + 2];
+
+    const gray =
+      0.299 * r +
+      0.587 * g +
+      0.114 * b;
+
+    grayscale.push(gray);
+  }
+
+  const average =
+    grayscale.reduce((sum, value) => sum + value, 0) /
+    grayscale.length;
+
+  return grayscale
+    .map(value => value >= average ? "1" : "0")
+    .join("");
+}
+
+function compressPhoto(image) {
+  const maxWidth = 640;
+  const maxHeight = 420;
+
+  let width = image.naturalWidth;
+  let height = image.naturalHeight;
+
+  const ratio = Math.min(
+    maxWidth / width,
+    maxHeight / height,
+    1
+  );
+
+  width = Math.round(width * ratio);
+  height = Math.round(height * ratio);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.drawImage(
+    image,
+    0,
+    0,
+    width,
+    height
+  );
+
+  return canvas.toDataURL(
+    "image/jpeg",
+    0.7
+  );
+}
+
+function loadPhoto(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      resolve({
+        hash: "",
+        preview: ""
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const image = new Image();
+
+      image.onload = () => {
+        try {
+          const hash = createImageHash(image);
+          const preview = compressPhoto(image);
+
+          resolve({
+            hash,
+            preview
+          });
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      image.onerror = reject;
+      image.src = reader.result;
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function getDuplicateScore(a, b) {
   let score = 0;
+  let photoSimilarity = 0;
 
   const phoneA = normalizePhone(a.phone);
   const phoneB = normalizePhone(b.phone);
 
-  if (phoneA && phoneB && phoneA === phoneB) {
-    score += 60;
+  if (
+    phoneA &&
+    phoneB &&
+    phoneA === phoneB
+  ) {
+    score += 45;
   }
 
-  const addressSimilarity = similarity(a.address, b.address);
+  const addressSimilarity =
+    similarity(a.address, b.address);
 
-  if (addressSimilarity >= 0.8) {
-    score += 35;
-  } else if (addressSimilarity >= 0.5) {
+  if (addressSimilarity >= 0.85) {
+    score += 30;
+  } else if (addressSimilarity >= 0.6) {
     score += 20;
+  } else if (addressSimilarity >= 0.4) {
+    score += 10;
   }
 
-  const titleSimilarity = similarity(a.title, b.title);
+  if (a.photoHash && b.photoHash) {
+    photoSimilarity = hammingSimilarity(
+      a.photoHash,
+      b.photoHash
+    );
 
-  if (titleSimilarity >= 0.7) {
-    score += 15;
+    if (photoSimilarity >= 0.94) {
+      score += 55;
+    } else if (photoSimilarity >= 0.9) {
+      score += 45;
+    } else if (photoSimilarity >= 0.84) {
+      score += 30;
+    } else if (photoSimilarity >= 0.78) {
+      score += 15;
+    }
+  }
+
+  const titleSimilarity =
+    similarity(a.title, b.title);
+
+  if (titleSimilarity >= 0.75) {
+    score += 12;
+  } else if (titleSimilarity >= 0.5) {
+    score += 6;
   }
 
   if (
     a.price &&
-    b.price &&
-    Math.abs(Number(a.price) - Number(b.price)) <= 50
+    b.price
   ) {
-    score += 10;
+    const difference =
+      Math.abs(
+        Number(a.price) -
+        Number(b.price)
+      );
+
+    if (difference === 0) {
+      score += 8;
+    } else if (difference <= 50) {
+      score += 5;
+    } else if (difference <= 100) {
+      score += 2;
+    }
   }
 
   if (
@@ -96,64 +276,96 @@ function getDuplicateScore(a, b) {
     score += 5;
   }
 
-  return Math.min(score, 100);
+  return {
+    score: Math.min(score, 100),
+    photoSimilarity: Math.round(
+      photoSimilarity * 100
+    )
+  };
 }
 
 function findDuplicateMatches(listing) {
   return listings
     .filter(other => other.id !== listing.id)
-    .map(other => ({
-      listing: other,
-      score: getDuplicateScore(listing, other)
-    }))
+    .map(other => {
+      const result =
+        getDuplicateScore(listing, other);
+
+      return {
+        listing: other,
+        score: result.score,
+        photoSimilarity:
+          result.photoSimilarity
+      };
+    })
     .filter(match => match.score >= 50)
     .sort((a, b) => b.score - a.score);
 }
 
-function countDuplicateGroups() {
-  const matchedIds = new Set();
+function getDuplicateGroups() {
+  const visited = new Set();
+  let groups = 0;
 
   listings.forEach(listing => {
-    const matches = findDuplicateMatches(listing);
+    if (visited.has(listing.id)) {
+      return;
+    }
 
-    if (matches.length) {
-      matchedIds.add(listing.id);
+    const matches =
+      findDuplicateMatches(listing);
+
+    if (matches.length > 0) {
+      groups++;
+      visited.add(listing.id);
 
       matches.forEach(match => {
-        matchedIds.add(match.listing.id);
+        visited.add(match.listing.id);
       });
     }
   });
 
-  return matchedIds.size;
+  return groups;
 }
 
 function matchesFilters(listing) {
-  const search = normalizeText(searchInput.value);
+  const search =
+    normalizeText(searchInput.value);
 
   if (search) {
-    const haystack = normalizeText(
-      `${listing.title} ${listing.address} ${listing.source}`
-    );
+    const haystack =
+      normalizeText(
+        `${listing.title} ${listing.address} ${listing.source}`
+      );
 
     if (!haystack.includes(search)) {
       return false;
     }
   }
 
-  const max = Number(maxPrice.value);
+  const max =
+    Number(maxPrice.value);
 
-  if (max && Number(listing.price) > max) {
+  if (
+    max &&
+    Number(listing.price) > max
+  ) {
     return false;
   }
 
-  const rooms = Number(minRooms.value);
+  const rooms =
+    Number(minRooms.value);
 
-  if (rooms && Number(listing.rooms) < rooms) {
+  if (
+    rooms &&
+    Number(listing.rooms) < rooms
+  ) {
     return false;
   }
 
-  if (currentView === "favorites" && !listing.favorite) {
+  if (
+    currentView === "favorites" &&
+    !listing.favorite
+  ) {
     return false;
   }
 
@@ -167,19 +379,67 @@ function matchesFilters(listing) {
   return true;
 }
 
+function escapeHtml(value = "") {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function createListingCard(listing) {
-  const article = document.createElement("article");
+  const article =
+    document.createElement("article");
+
   article.className = "listing-card";
 
-  const matches = findDuplicateMatches(listing);
-  const bestMatch = matches[0];
+  const matches =
+    findDuplicateMatches(listing);
+
+  const bestMatch =
+    matches[0];
+
+  let duplicateHtml = "";
+
+  if (bestMatch) {
+    duplicateHtml = `
+      <div class="duplicate-badge">
+        Possibile stesso appartamento:
+        compatibilità ${bestMatch.score}%
+      </div>
+    `;
+
+    if (bestMatch.photoSimilarity > 0) {
+      duplicateHtml += `
+        <div class="photo-match-badge">
+          Foto simile:
+          ${bestMatch.photoSimilarity}%
+        </div>
+      `;
+    }
+  }
 
   article.innerHTML = `
+    ${
+      listing.photoPreview
+        ? `
+          <img
+            class="listing-photo"
+            src="${listing.photoPreview}"
+            alt="Foto dell'annuncio"
+          >
+        `
+        : ""
+    }
+
     <div class="card-body">
 
       <div class="card-top">
         <span class="source-badge">
-          ${listing.source || "Annuncio"}
+          ${escapeHtml(
+            listing.source || "Annuncio"
+          )}
         </span>
 
         <button
@@ -188,23 +448,36 @@ function createListingCard(listing) {
           aria-label="Preferito"
           data-id="${listing.id}"
         >
-          ${listing.favorite ? "♥" : "♡"}
+          ${
+            listing.favorite
+              ? "♥"
+              : "♡"
+          }
         </button>
       </div>
 
       <h3 class="listing-title">
-        ${listing.title}
+        ${escapeHtml(listing.title)}
       </h3>
 
       <p class="listing-address">
-        ${listing.address || "Indirizzo non indicato"}
+        ${
+          escapeHtml(
+            listing.address ||
+            "Indirizzo non indicato"
+          )
+        }
       </p>
 
       <div class="facts">
         <strong class="listing-price">
           ${
             listing.price
-              ? `€ ${Number(listing.price).toLocaleString("it-IT")}/mese`
+              ? `€ ${Number(
+                  listing.price
+                ).toLocaleString(
+                  "it-IT"
+                )}/mese`
               : "Prezzo non indicato"
           }
         </strong>
@@ -212,25 +485,26 @@ function createListingCard(listing) {
         <span class="listing-rooms">
           ${
             listing.rooms
-              ? `${listing.rooms} locali`
+              ? `${escapeHtml(
+                  String(listing.rooms)
+                )} locali`
               : ""
           }
         </span>
       </div>
 
-      ${
-        bestMatch
-          ? `
-            <div class="duplicate-badge">
-              Possibile doppione: compatibilità ${bestMatch.score}%
-            </div>
-          `
-          : ""
-      }
+      ${duplicateHtml}
 
       ${
         listing.phone
-          ? `<p><strong>Telefono:</strong> ${listing.phone}</p>`
+          ? `
+            <p>
+              <strong>
+                Telefono:
+              </strong>
+              ${escapeHtml(listing.phone)}
+            </p>
+          `
           : ""
       }
 
@@ -239,7 +513,9 @@ function createListingCard(listing) {
           ? `
             <p>
               <a
-                href="${listing.url}"
+                href="${escapeHtml(
+                  listing.url
+                )}"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -267,7 +543,8 @@ function createListingCard(listing) {
 function render() {
   listingsContainer.innerHTML = "";
 
-  const filtered = listings.filter(matchesFilters);
+  const filtered =
+    listings.filter(matchesFilters);
 
   if (filtered.length === 0) {
     emptyState.style.display = "block";
@@ -281,108 +558,294 @@ function render() {
     });
   }
 
-  countListings.textContent = listings.length;
-  countGroups.textContent = countDuplicateGroups();
-  countFavs.textContent = listings.filter(
-    item => item.favorite
-  ).length;
+  countListings.textContent =
+    listings.length;
+
+  countGroups.textContent =
+    getDuplicateGroups();
+
+  countFavs.textContent =
+    listings.filter(
+      item => item.favorite
+    ).length;
 }
 
-openAdd.addEventListener("click", () => {
-  addDialog.showModal();
-});
+function resetPhoto() {
+  currentPhotoHash = "";
+  currentPhotoPreview = "";
 
-closeAdd.addEventListener("click", () => {
-  addDialog.close();
-});
+  photoPreviewImage.src = "";
+  photoPreview.hidden = true;
+}
 
-listingForm.addEventListener("submit", event => {
-  event.preventDefault();
+openAdd.addEventListener(
+  "click",
+  () => {
+    addDialog.showModal();
+  }
+);
 
-  const formData = new FormData(listingForm);
+closeAdd.addEventListener(
+  "click",
+  () => {
+    addDialog.close();
+    listingForm.reset();
+    resetPhoto();
+  }
+);
 
-  const listing = {
-    id: crypto.randomUUID
-      ? crypto.randomUUID()
-      : Date.now().toString(),
+photoInput.addEventListener(
+  "change",
+  async event => {
+    const file =
+      event.target.files[0];
 
-    title: formData.get("title")?.trim() || "",
-    address: formData.get("address")?.trim() || "",
-    price: formData.get("price") || "",
-    rooms: formData.get("rooms") || "",
-    phone: formData.get("phone")?.trim() || "",
-    source: formData.get("source")?.trim() || "",
-    url: formData.get("url")?.trim() || "",
-    favorite: false,
-    createdAt: new Date().toISOString()
-  };
+    if (!file) {
+      resetPhoto();
+      return;
+    }
 
-  listings.unshift(listing);
+    if (!file.type.startsWith("image/")) {
+      alert(
+        "Seleziona un file immagine."
+      );
 
-  saveListings();
-  listingForm.reset();
-  addDialog.close();
-  render();
-});
+      photoInput.value = "";
+      resetPhoto();
+      return;
+    }
 
-listingsContainer.addEventListener("click", event => {
-  const favoriteButton = event.target.closest(".fav-btn");
+    try {
+      const result =
+        await loadPhoto(file);
 
-  if (favoriteButton) {
-    const id = favoriteButton.dataset.id;
+      currentPhotoHash =
+        result.hash;
 
-    const listing = listings.find(item => item.id === id);
+      currentPhotoPreview =
+        result.preview;
 
-    if (listing) {
-      listing.favorite = !listing.favorite;
+      photoPreviewImage.src =
+        result.preview;
+
+      photoPreview.hidden = false;
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        "Non sono riuscito a leggere la foto."
+      );
+
+      resetPhoto();
+    }
+  }
+);
+
+listingForm.addEventListener(
+  "submit",
+  async event => {
+    event.preventDefault();
+
+    const formData =
+      new FormData(listingForm);
+
+    const listing = {
+      id:
+        typeof crypto !== "undefined" &&
+        crypto.randomUUID
+          ? crypto.randomUUID()
+          : Date.now().toString(),
+
+      title:
+        formData
+          .get("title")
+          ?.trim() || "",
+
+      address:
+        formData
+          .get("address")
+          ?.trim() || "",
+
+      price:
+        formData.get("price") || "",
+
+      rooms:
+        formData.get("rooms") || "",
+
+      phone:
+        formData
+          .get("phone")
+          ?.trim() || "",
+
+      source:
+        formData
+          .get("source")
+          ?.trim() || "",
+
+      url:
+        formData
+          .get("url")
+          ?.trim() || "",
+
+      photoHash:
+        currentPhotoHash,
+
+      photoPreview:
+        currentPhotoPreview,
+
+      favorite: false,
+
+      createdAt:
+        new Date().toISOString()
+    };
+
+    listings.unshift(listing);
+
+    try {
+      saveListings();
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        "La memoria del browser è piena. " +
+        "Prova a eliminare alcuni annunci."
+      );
+
+      listings.shift();
+      return;
+    }
+
+    listingForm.reset();
+    resetPhoto();
+    addDialog.close();
+
+    render();
+  }
+);
+
+listingsContainer.addEventListener(
+  "click",
+  event => {
+    const favoriteButton =
+      event.target.closest(
+        ".fav-btn"
+      );
+
+    if (favoriteButton) {
+      const id =
+        favoriteButton.dataset.id;
+
+      const listing =
+        listings.find(
+          item => item.id === id
+        );
+
+      if (listing) {
+        listing.favorite =
+          !listing.favorite;
+
+        saveListings();
+        render();
+      }
+
+      return;
+    }
+
+    const deleteButton =
+      event.target.closest(
+        "[data-delete-id]"
+      );
+
+    if (deleteButton) {
+      const id =
+        deleteButton.dataset.deleteId;
+
+      const confirmed =
+        confirm(
+          "Vuoi eliminare questo annuncio?"
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      listings =
+        listings.filter(
+          item => item.id !== id
+        );
+
       saveListings();
       render();
     }
-
-    return;
   }
+);
 
-  const deleteButton = event.target.closest("[data-delete-id]");
+searchInput.addEventListener(
+  "input",
+  render
+);
 
-  if (deleteButton) {
-    const id = deleteButton.dataset.deleteId;
+maxPrice.addEventListener(
+  "input",
+  render
+);
 
-    const confirmed = confirm(
-      "Vuoi eliminare questo annuncio?"
-    );
+minRooms.addEventListener(
+  "change",
+  render
+);
 
-    if (!confirmed) return;
+clearFilters.addEventListener(
+  "click",
+  () => {
+    searchInput.value = "";
+    maxPrice.value = "";
+    minRooms.value = "0";
 
-    listings = listings.filter(item => item.id !== id);
-
-    saveListings();
     render();
   }
-});
-
-searchInput.addEventListener("input", render);
-maxPrice.addEventListener("input", render);
-minRooms.addEventListener("change", render);
-
-clearFilters.addEventListener("click", () => {
-  searchInput.value = "";
-  maxPrice.value = "";
-  minRooms.value = "0";
-  render();
-});
+);
 
 navItems.forEach(button => {
-  button.addEventListener("click", () => {
-    navItems.forEach(item =>
-      item.classList.remove("active")
-    );
+  button.addEventListener(
+    "click",
+    () => {
+      navItems.forEach(item => {
+        item.classList.remove(
+          "active"
+        );
+      });
 
-    button.classList.add("active");
+      button.classList.add(
+        "active"
+      );
 
-    currentView = button.dataset.view;
+      currentView =
+        button.dataset.view;
 
-    render();
-  });
+      render();
+    }
+  );
 });
+
+addDialog.addEventListener(
+  "click",
+  event => {
+    const rect =
+      addDialog.getBoundingClientRect();
+
+    const clickedOutside =
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom;
+
+    if (clickedOutside) {
+      addDialog.close();
+      listingForm.reset();
+      resetPhoto();
+    }
+  }
+);
 
 render();
