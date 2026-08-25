@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Affitti Smart</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Casa più facile</p>
+      <h1>Affitti Smart</h1>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Scopri se hai già visto la stessa casa</h2>
+      <p>
+        Aggiungi annunci da siti diversi. L’app confronta indirizzo,
+        telefono e foto e segnala i possibili duplicati.
+      </p>
+
+      <button id="openAdd" class="primary">
+        + Aggiungi annuncio
+      </button>
+    </section>
+
+    <section class="search-card">
+      <label>
+        Cerca
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Città, zona, via o titolo"
+        >
+      </label>
+
+      <div class="filters-row">
+        <label>
+          Prezzo massimo
+          <input
+            id="maxPrice"
+            type="number"
+            min="0"
+            placeholder="900"
+          >
+        </label>
+
+        <label>
+          Locali minimi
+          <select id="minRooms">
+            <option value="0">Tutti</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="summary">
+      <div>
+        <strong id="countListings">0</strong>
+        <span>annunci</span>
+      </div>
+
+      <div>
+        <strong id="countGroups">0</strong>
+        <span>duplicati</span>
+      </div>
+
+      <div>
+        <strong id="countFavs">0</strong>
+        <span>preferiti</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>I tuoi annunci</h2>
+        <button id="clearFilters" class="link-btn">
+          Azzera filtri
+        </button>
+      </div>
+
+      <div id="emptyState" class="empty">
+        <div class="empty-icon">⌂</div>
+        <h3>Nessun annuncio ancora</h3>
+        <p>
+          Aggiungine almeno due per iniziare a confrontarli.
+        </p>
+      </div>
+
+      <div id="listings" class="listings"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-view="all">
+      <span>⌂</span>
+      <small>Annunci</small>
+    </button>
+
+    <button class="nav-item" data-view="duplicates">
+      <span>≋</span>
+      <small>Doppioni</small>
+    </button>
+
+    <button class="nav-item" data-view="favorites">
+      <span>♡</span>
+      <small>Preferiti</small>
+    </button>
+  </nav>
+
+  <dialog id="addDialog">
+    <form id="listingForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Nuovo</p>
+          <h2>Aggiungi annuncio</h2>
+        </div>
+
+        <button
+          type="button"
+          id="closeAdd"
+          class="icon-btn"
+        >
+          ×
+        </button>
+      </div>
+
+      <label>
+        Link annuncio
+        <input
+          name="url"
+          type="url"
+          placeholder="https://..."
+        >
+      </label>
+
+      <label>
+        Titolo
+        <input
+          name="title"
+          required
+          placeholder="Es. Trilocale luminoso"
+        >
+      </label>
+
+      <label>
+        Indirizzo
+        <input
+          name="address"
+          placeholder="Via, numero, città"
+        >
+      </label>
+
+      <div class="filters-row">
+        <label>
+          Prezzo €/mese
+          <input
+            name="price"
+            type="number"
+            min="0"
+          >
+        </label>
+
+        <label>
+          Locali
+          <input
+            name="rooms"
+            type="number"
+            min="0"
+          >
+        </label>
+      </div>
+
+      <label>
+        Telefono inserzionista
+        <input
+          name="phone"
+          type="tel"
+          placeholder="+39..."
+        >
+      </label>
+
+      <label>
+        Sito / fonte
+        <input
+          name="source"
+          placeholder="Immobiliare, Idealista, Subito..."
+        >
+      </label>
+
+      <button
+        type="submit"
+        class="primary full-btn"
+      >
+        Salva e confronta
+      </button>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
