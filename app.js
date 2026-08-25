@@ -471,9 +471,16 @@ function populatePoiOptions() {
 
   });
 
-  poiResults.hidden = false;
+ poiResults.hidden = false;
 
-  distanceBlock.hidden = true;
+distanceBlock.hidden = true;
+
+setTimeout(() => {
+  poiResults.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
+}, 100);
 
 }
 
@@ -485,6 +492,17 @@ searchWizard.elements.poi
 
       distanceBlock.hidden =
         !event.target.value;
+
+      if (event.target.value) {
+
+        setTimeout(() => {
+          distanceBlock.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+          });
+        }, 100);
+
+      }
 
     }
   );
