@@ -899,24 +899,6 @@ function buildSearchSummary() {
   }
 
 
-  if (data.duration) {
-
-    lines.push(`
-
-      <div>
-        ⏳ Durata:
-        <strong>
-          ${escapeHtml(
-            data.duration
-          )}
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
   const generalPreferences = [];
 
   if (data.petFriendly) {
@@ -1099,10 +1081,6 @@ function collectFormData() {
 
     availableFrom:
       elements.availableFrom
-        .value,
-
-    duration:
-      elements.duration
         .value,
 
     petFriendly:
