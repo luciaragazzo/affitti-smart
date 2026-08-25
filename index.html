@@ -18,9 +18,10 @@
   <main>
     <section class="hero">
       <h2>Scopri se hai già visto la stessa casa</h2>
+
       <p>
         Aggiungi annunci da siti diversi. L’app confronta indirizzo,
-        telefono e foto e segnala i possibili duplicati.
+        telefono, dati dell’annuncio e foto per segnalarti i possibili duplicati.
       </p>
 
       <button id="openAdd" class="primary">
@@ -82,6 +83,7 @@
     <section>
       <div class="section-title">
         <h2>I tuoi annunci</h2>
+
         <button id="clearFilters" class="link-btn">
           Azzera filtri
         </button>
@@ -89,7 +91,9 @@
 
       <div id="emptyState" class="empty">
         <div class="empty-icon">⌂</div>
+
         <h3>Nessun annuncio ancora</h3>
+
         <p>
           Aggiungine almeno due per iniziare a confrontarli.
         </p>
@@ -118,6 +122,7 @@
 
   <dialog id="addDialog">
     <form id="listingForm" method="dialog">
+
       <div class="dialog-head">
         <div>
           <p class="eyebrow">Nuovo</p>
@@ -128,6 +133,7 @@
           type="button"
           id="closeAdd"
           class="icon-btn"
+          aria-label="Chiudi"
         >
           ×
         </button>
@@ -196,12 +202,40 @@
         >
       </label>
 
+      <label>
+        Foto annuncio
+        <input
+          id="photoInput"
+          name="photo"
+          type="file"
+          accept="image/*"
+        >
+      </label>
+
+      <p class="photo-help">
+        La foto non viene caricata online.
+        L’app genera soltanto un’impronta visiva per confrontarla
+        con le immagini degli altri annunci.
+      </p>
+
+      <div
+        id="photoPreview"
+        class="photo-preview"
+        hidden
+      >
+        <img
+          id="photoPreviewImage"
+          alt="Anteprima foto annuncio"
+        >
+      </div>
+
       <button
         type="submit"
         class="primary full-btn"
       >
         Salva e confronta
       </button>
+
     </form>
   </dialog>
 
