@@ -3,242 +3,1067 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="description"
+    content="Affitti Smart organizza la tua ricerca casa: annunci, chiamate, note, visite e possibili duplicati."
+  >
+
+  <meta name="theme-color" content="#0d6b5f">
+
   <title>Affitti Smart</title>
+
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <header class="topbar">
-    <div>
-      <p class="eyebrow">Casa più facile</p>
-      <h1>Affitti Smart</h1>
-    </div>
-  </header>
 
-  <main>
-    <section class="hero">
-      <h2>Scopri se hai già visto la stessa casa</h2>
+<header class="site-header">
 
-      <p>
-        Aggiungi annunci da siti diversi. L’app confronta indirizzo,
-        telefono, dati dell’annuncio e foto per segnalarti i possibili duplicati.
+  <a class="brand" href="#">
+
+    <span class="brand-mark">
+      A
+    </span>
+
+    <span class="brand-name">
+      Affitti <strong>Smart</strong>
+    </span>
+
+  </a>
+
+  <div class="header-actions">
+
+    <button
+      class="login-button"
+      type="button"
+    >
+      Accedi
+    </button>
+
+    <button
+      class="primary small"
+      id="headerStart"
+      type="button"
+    >
+      Provalo gratis
+    </button>
+
+  </div>
+
+</header>
+
+
+<main>
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="hero-copy">
+
+      <div class="hero-label">
+        La ricerca casa, finalmente organizzata
+      </div>
+
+      <h1>
+        Non chiamare due volte
+        lo stesso annuncio.
+
+        <span>
+          Non perdere quello giusto.
+        </span>
+      </h1>
+
+      <p class="hero-description">
+        Affitti Smart organizza la tua ricerca:
+        nuovi annunci, preferiti, note,
+        chiamate, richiami, visite e possibili
+        doppioni, tutto in un unico posto.
       </p>
 
-      <button id="openAdd" class="primary">
-        + Aggiungi annuncio
-      </button>
-    </section>
-
-    <section class="search-card">
-      <label>
-        Cerca
-        <input
-          id="searchInput"
-          type="search"
-          placeholder="Città, zona, via o titolo"
-        >
-      </label>
-
-      <div class="filters-row">
-        <label>
-          Prezzo massimo
-          <input
-            id="maxPrice"
-            type="number"
-            min="0"
-            placeholder="900"
-          >
-        </label>
-
-        <label>
-          Locali minimi
-          <select id="minRooms">
-            <option value="0">Tutti</option>
-            <option value="1">1+</option>
-            <option value="2">2+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
-          </select>
-        </label>
-      </div>
-    </section>
-
-    <section class="summary">
-      <div>
-        <strong id="countListings">0</strong>
-        <span>annunci</span>
-      </div>
-
-      <div>
-        <strong id="countGroups">0</strong>
-        <span>duplicati</span>
-      </div>
-
-      <div>
-        <strong id="countFavs">0</strong>
-        <span>preferiti</span>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-title">
-        <h2>I tuoi annunci</h2>
-
-        <button id="clearFilters" class="link-btn">
-          Azzera filtri
-        </button>
-      </div>
-
-      <div id="emptyState" class="empty">
-        <div class="empty-icon">⌂</div>
-
-        <h3>Nessun annuncio ancora</h3>
-
-        <p>
-          Aggiungine almeno due per iniziare a confrontarli.
-        </p>
-      </div>
-
-      <div id="listings" class="listings"></div>
-    </section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-view="all">
-      <span>⌂</span>
-      <small>Annunci</small>
-    </button>
-
-    <button class="nav-item" data-view="duplicates">
-      <span>≋</span>
-      <small>Doppioni</small>
-    </button>
-
-    <button class="nav-item" data-view="favorites">
-      <span>♡</span>
-      <small>Preferiti</small>
-    </button>
-  </nav>
-
-  <dialog id="addDialog">
-    <form id="listingForm" method="dialog">
-
-      <div class="dialog-head">
-        <div>
-          <p class="eyebrow">Nuovo</p>
-          <h2>Aggiungi annuncio</h2>
-        </div>
+      <div class="hero-buttons">
 
         <button
+          class="primary"
+          id="heroStart"
           type="button"
-          id="closeAdd"
-          class="icon-btn"
-          aria-label="Chiudi"
         >
-          ×
+          Provalo gratis
         </button>
+
+        <button
+          class="secondary"
+          id="discoverButton"
+          type="button"
+        >
+          Scopri come funziona
+        </button>
+
       </div>
 
-      <label>
-        Link annuncio
-        <input
-          name="url"
-          type="url"
-          placeholder="https://..."
-        >
-      </label>
+      <div class="hero-notes">
 
-      <label>
-        Titolo
-        <input
-          name="title"
-          required
-          placeholder="Es. Trilocale luminoso"
-        >
-      </label>
+        <span>
+          ✓ Beta gratuita
+        </span>
 
-      <label>
-        Indirizzo
-        <input
-          name="address"
-          placeholder="Via, numero, città"
-        >
-      </label>
+        <span>
+          ✓ Nessuna carta richiesta
+        </span>
 
-      <div class="filters-row">
-        <label>
-          Prezzo €/mese
-          <input
-            name="price"
-            type="number"
-            min="0"
-          >
-        </label>
+        <span>
+          ✓ Pensato per smartphone
+        </span>
 
-        <label>
-          Locali
-          <input
-            name="rooms"
-            type="number"
-            min="0"
-          >
-        </label>
       </div>
 
-      <label>
-        Telefono inserzionista
-        <input
-          name="phone"
-          type="tel"
-          placeholder="+39..."
-        >
-      </label>
+    </div>
 
-      <label>
-        Sito / fonte
-        <input
-          name="source"
-          placeholder="Immobiliare, Idealista, Subito..."
-        >
-      </label>
 
-      <label>
-        Foto annuncio
-        <input
-          id="photoInput"
-          name="photo"
-          type="file"
-          accept="image/*"
-        >
-      </label>
+    <!-- MOCKUP APP -->
 
-      <p class="photo-help">
-        La foto non viene caricata online.
-        L’app genera soltanto un’impronta visiva per confrontarla
-        con le immagini degli altri annunci.
+    <div class="phone">
+
+      <div class="phone-screen">
+
+        <div class="phone-brand">
+
+          <span class="brand-mark mini">
+            A
+          </span>
+
+          <span>
+            Affitti <strong>Smart</strong>
+          </span>
+
+        </div>
+
+
+        <div class="phone-heading">
+
+          <small>
+            Le mie ricerche
+          </small>
+
+          <h3>
+            Prato · Parco Prato
+          </h3>
+
+          <p>
+            Stanza · max €550 · entro 2 km
+          </p>
+
+        </div>
+
+
+        <div class="phone-stats">
+
+          <div>
+            <strong>6</strong>
+            <span>Nuovi</span>
+          </div>
+
+          <div>
+            <strong>4</strong>
+            <span>Salvati</span>
+          </div>
+
+          <div>
+            <strong>2</strong>
+            <span>Da richiamare</span>
+          </div>
+
+        </div>
+
+
+        <article class="demo-listing">
+
+          <div class="demo-image">
+          </div>
+
+          <div>
+
+            <span class="badge new">
+              Nuovo
+            </span>
+
+            <h4>
+              Stanza luminosa vicino al parco
+            </h4>
+
+            <p>
+              €480/mese · 650 m
+            </p>
+
+          </div>
+
+        </article>
+
+
+        <article class="demo-listing">
+
+          <div class="demo-image second">
+          </div>
+
+          <div>
+
+            <span class="badge called">
+              Chiamato
+            </span>
+
+            <h4>
+              Camera singola in appartamento
+            </h4>
+
+            <p>
+              Da richiamare venerdì
+            </p>
+
+          </div>
+
+        </article>
+
+
+        <button
+          class="phone-search-button"
+          id="phoneSearchButton"
+          type="button"
+        >
+          + Nuova ricerca
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- COSA FA -->
+
+  <section
+    class="section"
+    id="howItWorks"
+  >
+
+    <div class="section-heading">
+
+      <span class="eyebrow">
+        Cerca casa in modo smart
+      </span>
+
+      <h2>
+        Tieni il filo della ricerca,
+        dall'annuncio alla visita.
+      </h2>
+
+      <p>
+        Affitti Smart non vuole essere
+        un altro portale immobiliare.
+
+        Ti aiuta a gestire in modo
+        organizzato tutto quello che trovi.
       </p>
 
-      <div
-        id="photoPreview"
-        class="photo-preview"
-        hidden
-      >
-        <img
-          id="photoPreviewImage"
-          alt="Anteprima foto annuncio"
+    </div>
+
+
+    <div class="feature-grid">
+
+      <article class="feature">
+
+        <div class="feature-icon">
+          ≋
+        </div>
+
+        <h3>
+          Evita i doppioni
+        </h3>
+
+        <p>
+          Riconosci possibili annunci già
+          visti o pubblicati su più siti.
+        </p>
+
+      </article>
+
+
+      <article class="feature">
+
+        <div class="feature-icon">
+          ♡
+        </div>
+
+        <h3>
+          Salva ciò che ti interessa
+        </h3>
+
+        <p>
+          Metti tra i preferiti gli immobili
+          che vuoi valutare.
+        </p>
+
+      </article>
+
+
+      <article class="feature">
+
+        <div class="feature-icon">
+          ☎
+        </div>
+
+        <h3>
+          Tieni traccia delle chiamate
+        </h3>
+
+        <p>
+          Da chiamare, chiamato,
+          da richiamare o non risponde.
+        </p>
+
+      </article>
+
+
+      <article class="feature">
+
+        <div class="feature-icon">
+          ✎
+        </div>
+
+        <h3>
+          Scrivi le tue note
+        </h3>
+
+        <p>
+          Ricorda cosa ti hanno detto,
+          condizioni e impressioni.
+        </p>
+
+      </article>
+
+
+      <article class="feature">
+
+        <div class="feature-icon">
+          ◷
+        </div>
+
+        <h3>
+          Organizza le visite
+        </h3>
+
+        <p>
+          Segna data e ora e aggiungi
+          l'appuntamento al calendario.
+        </p>
+
+      </article>
+
+
+      <article class="feature">
+
+        <div class="feature-icon">
+          ×
+        </div>
+
+        <h3>
+          Scarta senza dimenticare
+        </h3>
+
+        <p>
+          Mantieni memoria di ciò che
+          hai escluso e del perché.
+        </p>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- RICERCA GUIDATA -->
+
+  <section class="section soft">
+
+    <div class="section-heading">
+
+      <span class="eyebrow">
+        Ricerca guidata
+      </span>
+
+      <h2>
+        Pochi passaggi.
+        Solo i filtri che servono.
+      </h2>
+
+      <p>
+        Le opzioni cambiano automaticamente
+        in base a ciò che stai cercando.
+      </p>
+
+    </div>
+
+
+    <div class="steps">
+
+      <article>
+
+        <span>1</span>
+
+        <h3>
+          Dove cerchi?
+        </h3>
+
+        <p>
+          Città, zona o punto di interesse
+          e distanza massima.
+        </p>
+
+      </article>
+
+
+      <article>
+
+        <span>2</span>
+
+        <h3>
+          Cosa cerchi?
+        </h3>
+
+        <p>
+          Stanza, monolocale o appartamento.
+        </p>
+
+      </article>
+
+
+      <article>
+
+        <span>3</span>
+
+        <h3>
+          Budget e disponibilità
+        </h3>
+
+        <p>
+          Prezzo massimo, ingresso
+          e durata desiderata.
+        </p>
+
+      </article>
+
+
+      <article>
+
+        <span>4</span>
+
+        <h3>
+          Ricerca avanzata
+        </h3>
+
+        <p>
+          Aggiungi altri filtri
+          solo se ne hai bisogno.
+        </p>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- BETA -->
+
+  <section
+    class="beta-section"
+    id="beta"
+  >
+
+    <div>
+
+      <span class="eyebrow">
+        Beta
+      </span>
+
+      <h2>
+        Vuoi provarlo tra i primi?
+      </h2>
+
+      <p>
+        Stiamo preparando la prima versione
+        di Affitti Smart.
+
+        Registrati per partecipare alla beta.
+      </p>
+
+    </div>
+
+
+    <form
+      class="beta-form"
+      id="betaForm"
+    >
+
+      <label>
+
+        Nome
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Il tuo nome"
+          required
         >
+
+      </label>
+
+
+      <label>
+
+        Email
+
+        <input
+          type="email"
+          name="email"
+          placeholder="nome@email.it"
+          required
+        >
+
+      </label>
+
+
+      <label>
+
+        Città in cui cerchi
+
+        <input
+          type="text"
+          name="city"
+          placeholder="Es. Prato"
+        >
+
+      </label>
+
+
+      <label>
+
+        Cosa cerchi?
+
+        <select name="type">
+
+          <option>
+            Stanza
+          </option>
+
+          <option>
+            Monolocale
+          </option>
+
+          <option>
+            Appartamento
+          </option>
+
+        </select>
+
+      </label>
+
+
+      <button
+        class="primary full"
+        type="submit"
+      >
+        Voglio provarlo
+      </button>
+
+      <small id="betaMessage">
+        Nessun pagamento richiesto.
+      </small>
+
+    </form>
+
+  </section>
+
+</main>
+
+
+<footer>
+
+  <div class="brand">
+
+    <span class="brand-mark mini">
+      A
+    </span>
+
+    <span class="brand-name">
+      Affitti <strong>Smart</strong>
+    </span>
+
+  </div>
+
+  <div>
+    Privacy · Termini · Contatti
+  </div>
+
+</footer>
+
+
+
+<!-- MODALE NUOVA RICERCA -->
+
+<dialog id="searchDialog">
+
+  <form id="searchWizard">
+
+    <div class="dialog-header">
+
+      <div>
+
+        <span class="eyebrow">
+          Nuova ricerca
+        </span>
+
+        <h2 id="wizardTitle">
+          Dove cerchi?
+        </h2>
+
       </div>
 
       <button
-        type="submit"
-        class="primary full-btn"
+        type="button"
+        id="closeDialog"
+        class="close-button"
       >
-        Salva e confronta
+        ×
       </button>
 
-    </form>
-  </dialog>
+    </div>
 
-  <script src="app.js"></script>
+
+    <div class="progress">
+
+      <span id="progressBar">
+      </span>
+
+    </div>
+
+
+
+    <!-- STEP 1 -->
+
+    <section
+      class="wizard-step active"
+      data-step="1"
+    >
+
+      <label>
+
+        Città
+
+        <input
+          name="searchCity"
+          placeholder="Es. Prato"
+          required
+        >
+
+      </label>
+
+
+      <label>
+
+        Zona o punto di interesse
+
+        <input
+          name="poi"
+          placeholder="Es. Parco Prato"
+        >
+
+      </label>
+
+
+      <label>
+
+        Distanza massima
+
+        <select name="distance">
+
+          <option value="1">
+            1 km
+          </option>
+
+          <option value="2">
+            2 km
+          </option>
+
+          <option value="5">
+            5 km
+          </option>
+
+          <option value="10">
+            10 km
+          </option>
+
+        </select>
+
+      </label>
+
+    </section>
+
+
+
+    <!-- STEP 2 -->
+
+    <section
+      class="wizard-step"
+      data-step="2"
+    >
+
+      <div class="choice-grid">
+
+        <button
+          type="button"
+          class="property-choice active"
+          data-type="Stanza"
+        >
+          Stanza
+        </button>
+
+
+        <button
+          type="button"
+          class="property-choice"
+          data-type="Monolocale"
+        >
+          Monolocale
+        </button>
+
+
+        <button
+          type="button"
+          class="property-choice"
+          data-type="Appartamento"
+        >
+          Appartamento
+        </button>
+
+      </div>
+
+
+
+      <!-- FILTRI SPECIFICI STANZA -->
+
+      <div
+        class="room-filters"
+        id="roomFilters"
+      >
+
+        <h3>
+          Per la stanza puoi selezionare:
+        </h3>
+
+
+        <div class="checkbox-grid">
+
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              name="womenOnly"
+            >
+            Solo donne
+          </label>
+
+
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              name="menOnly"
+            >
+            Solo uomini
+          </label>
+
+
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              name="mixed"
+            >
+            Coinquilini misti
+          </label>
+
+
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              name="privateBathroom"
+            >
+            Bagno privato
+          </label>
+
+
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              name="petFriendly"
+            >
+            Pet friendly
+          </label>
+
+
+          <label class="checkbox">
+            <input
+              type="checkbox"
+              name="couplesAllowed"
+            >
+            Coppie ammesse
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- STEP 3 -->
+
+    <section
+      class="wizard-step"
+      data-step="3"
+    >
+
+      <label>
+
+        Budget massimo al mese
+
+        <input
+          name="budget"
+          type="number"
+          min="0"
+          step="50"
+          placeholder="Es. 550"
+        >
+
+      </label>
+
+
+      <label>
+
+        Disponibile da
+
+        <input
+          name="availableFrom"
+          type="date"
+        >
+
+      </label>
+
+
+      <label>
+
+        Durata desiderata
+
+        <select name="duration">
+
+          <option>
+            Indifferente
+          </option>
+
+          <option>
+            1–3 mesi
+          </option>
+
+          <option>
+            3–6 mesi
+          </option>
+
+          <option>
+            6–12 mesi
+          </option>
+
+          <option>
+            Oltre 12 mesi
+          </option>
+
+        </select>
+
+      </label>
+
+    </section>
+
+
+
+    <!-- STEP 4 -->
+
+    <section
+      class="wizard-step"
+      data-step="4"
+    >
+
+      <details>
+
+        <summary>
+          Ricerca avanzata
+        </summary>
+
+
+        <div class="checkbox-grid advanced">
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Arredato
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Utenze incluse
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Wi-Fi incluso
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Solo privati
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            No commissioni agenzia
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Balcone / terrazzo
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Ascensore
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Posto auto / garage
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Aria condizionata
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Lavatrice
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            Lavastoviglie
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            No piano terra
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox">
+            No seminterrato
+          </label>
+
+        </div>
+
+
+        <label>
+
+          Tipo di contratto
+
+          <select>
+
+            <option>
+              Indifferente
+            </option>
+
+            <option>
+              Transitorio
+            </option>
+
+            <option>
+              Studenti
+            </option>
+
+            <option>
+              3+2
+            </option>
+
+            <option>
+              4+4
+            </option>
+
+          </select>
+
+        </label>
+
+      </details>
+
+    </section>
+
+
+
+    <!-- STEP 5 -->
+
+    <section
+      class="wizard-step"
+      data-step="5"
+    >
+
+      <div
+        class="search-summary"
+        id="searchSummary"
+      >
+      </div>
+
+      <p class="summary-note">
+        Potrai modificare i filtri
+        anche dopo.
+      </p>
+
+    </section>
+
+
+
+    <div class="wizard-buttons">
+
+      <button
+        type="button"
+        class="secondary"
+        id="previousButton"
+      >
+        Indietro
+      </button>
+
+
+      <button
+        type="button"
+        class="primary"
+        id="nextButton"
+      >
+        Continua
+      </button>
+
+    </div>
+
+  </form>
+
+</dialog>
+
+
+<script src="app.js"></script>
+
 </body>
 </html>
