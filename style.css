@@ -4,13 +4,21 @@
   --text: #18211b;
   --muted: #66736b;
   --green: #14532d;
+  --green-2: #1f6b3d;
   --green-light: #e7f2ea;
   --border: #dfe6e1;
+  --warning: #fff5d8;
+  --warning-text: #725b00;
+  --danger: #a61b1b;
   --shadow: 0 10px 30px rgba(20, 83, 45, 0.08);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -29,6 +37,10 @@ select {
 
 button {
   cursor: pointer;
+}
+
+a {
+  color: var(--green);
 }
 
 .topbar {
@@ -59,7 +71,7 @@ main {
 }
 
 .hero {
-  background: linear-gradient(135deg, #14532d, #1f6b3d);
+  background: linear-gradient(135deg, var(--green), var(--green-2));
   color: white;
   border-radius: 24px;
   padding: 24px;
@@ -238,6 +250,7 @@ select:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-top: 14px;
 }
 
@@ -248,11 +261,20 @@ select:focus {
 
 .duplicate-badge {
   margin-top: 12px;
-  background: #fff5d8;
-  color: #725b00;
+  background: var(--warning);
+  color: var(--warning-text);
   border-radius: 10px;
   padding: 10px;
   font-size: 13px;
+  font-weight: 700;
+}
+
+.delete-btn {
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  padding: 8px 0;
   font-weight: 700;
 }
 
@@ -270,6 +292,7 @@ select:focus {
   box-shadow: var(--shadow);
   padding: 8px;
   z-index: 10;
+  backdrop-filter: blur(12px);
 }
 
 .nav-item {
@@ -291,6 +314,8 @@ select:focus {
 
 dialog {
   width: min(calc(100% - 24px), 560px);
+  max-height: calc(100vh - 30px);
+  overflow-y: auto;
   border: 0;
   border-radius: 22px;
   padding: 0;
@@ -317,6 +342,68 @@ dialog::backdrop {
   width: 100%;
   background: var(--green);
   color: white;
+}
+
+.photo-help {
+  margin: -6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.photo-preview {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #eef2ef;
+  border: 1px solid var(--border);
+}
+
+.photo-preview img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+}
+
+.listing-photo {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+  background: #eef2ef;
+}
+
+.photo-match-badge {
+  margin-top: 8px;
+  background: var(--green-light);
+  color: var(--green);
+  border-radius: 10px;
+  padding: 9px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .hero h2 {
+    font-size: 25px;
+  }
+
+  .filters-row {
+    grid-template-columns: 1fr;
+  }
+
+  .summary {
+    gap: 7px;
+  }
+
+  .summary div {
+    padding: 12px 6px;
+  }
+
+  .summary span {
+    font-size: 11px;
+  }
 }
 
 @media (min-width: 700px) {
