@@ -461,62 +461,69 @@ function populatePoiOptions() {
     );
 
   });
+const oldMessage =
+  poiResults.querySelector(
+    ".poi-demo-message"
+  );
+
+if (oldMessage) {
+  oldMessage.remove();
+}
+
+const poiLabel =
+  poiSelect.closest("label");
+
+
 if (options.length === 0) {
 
-  const oldHelp =
-    poiResults.querySelector(
-      ".poi-demo-help"
-    );
+  poiLabel.style.display =
+    "none";
 
-  if (oldHelp) {
-    oldHelp.remove();
-  }
-
-
-  const option =
+  const message =
     document.createElement(
-      "option"
+      "div"
     );
 
-  option.value = "";
+  message.className =
+    "poi-demo-message";
 
-  option.textContent =
-    "Nessun suggerimento disponibile nella demo per questa categoria";
+  message.innerHTML =
+    "<strong>Nessun suggerimento demo per questa categoria.</strong><br>" +
+    "Questo non significa che il luogo non esista. " +
+    "Puoi inserire liberamente il nome di una scuola, un indirizzo o una zona nel campo sopra.";
 
-  poiSelect.appendChild(
-    option
-  );
+  message.style.padding =
+    "12px 14px";
 
-
-  const help =
-    document.createElement(
-      "small"
-    );
-
-  help.className =
-    "poi-demo-help";
-
-  help.textContent =
-    "Puoi comunque inserire una scuola, un indirizzo o una zona nel campo sopra.";
-
-  help.style.display =
-    "block";
-
-  help.style.marginTop =
+  message.style.marginTop =
     "8px";
 
-  help.style.color =
+  message.style.background =
+    "#ffffff";
+
+  message.style.border =
+    "1px solid #d7e7e3";
+
+  message.style.borderRadius =
+    "12px";
+
+  message.style.color =
     "#70827e";
 
-  help.style.fontWeight =
-    "500";
+  message.style.fontSize =
+    "13px";
 
-  help.style.lineHeight =
-    "1.4";
+  message.style.lineHeight =
+    "1.5";
 
   poiResults.appendChild(
-    help
+    message
   );
+
+} else {
+
+  poiLabel.style.display =
+    "flex";
 
 }
 
