@@ -441,18 +441,9 @@ function populatePoiOptions() {
 
   } else {
 
-    options = [
-      `${selectedPoiCategory} principale di ${
-        capitalize(
-          searchWizard.elements
-            .searchCity
-            .value
-            .trim()
-        )
-      }`
-    ];
+  options = [];
 
-  }
+}
 
   options.forEach(name => {
 
@@ -470,7 +461,23 @@ function populatePoiOptions() {
     );
 
   });
+if (options.length === 0) {
 
+  const option =
+    document.createElement(
+      "option"
+    );
+
+  option.value = "";
+
+  option.textContent =
+    "Nessun suggerimento disponibile nella demo";
+
+  poiSelect.appendChild(
+    option
+  );
+
+}
  poiResults.hidden = false;
 
 distanceBlock.hidden = true;
