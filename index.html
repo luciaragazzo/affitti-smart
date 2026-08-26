@@ -6,7 +6,7 @@
   <meta name="description" content="Affitti Smart organizza la ricerca di casa, riconosce gli annunci già aggiunti e permette di cercare insieme alle persone che vuoi.">
   <meta name="theme-color" content="#0E6B4F">
   <title>Affitti Smart</title>
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
   <header class="site-header">
@@ -44,7 +44,7 @@
       </div>
 
       <div class="product-demo" aria-label="Esempio di ricerca condivisa">
-        <div class="demo-kicker">Stessa ricerca, tutti aggiornati</div>
+        <div class="demo-label"><span>Ricerca condivisa</span><strong>Stessa ricerca, tutti aggiornati</strong></div>
 
         <article class="activity-card status-visit">
           <div class="avatar avatar-a">G</div>
@@ -91,7 +91,7 @@
             </div>
             <div class="duplicate-panel">
               <span class="duplicate-icon">✓</span>
-              <div><strong>Già presente nella ricerca</strong><p>Giulia lo ha aggiunto ieri. Visita già fissata.</p></div>
+              <div><strong>Questo immobile è già nella ricerca</strong><p>Aggiunto ieri da Giulia · Visita fissata sabato alle 10:30</p></div>
             </div>
           </div>
         </article>
@@ -177,21 +177,58 @@
       <div class="wizard-body">
         <section class="wizard-step active" data-step="1">
           <p class="step-intro">Serve a capire quali esigenze deve rispettare davvero la casa.</p>
-          <div class="choice-grid single-choice" data-group="household">
-            <button type="button" class="choice-card" data-value="Solo io"><span>👤</span><strong>Solo io</strong></button>
-            <button type="button" class="choice-card" data-value="Io e il mio partner"><span>👥</span><strong>Io e il mio partner</strong></button>
-            <button type="button" class="choice-card" data-value="Famiglia"><span>🏡</span><strong>La mia famiglia</strong></button>
-            <button type="button" class="choice-card" data-value="Io e altre persone"><span>🤝</span><strong>Io e altre persone</strong></button>
-            <button type="button" class="choice-card" data-value="Cerco per un'altra persona"><span>♡</span><strong>Cerco per un’altra persona</strong></button>
+          <div class="household-choice-group single-choice" data-group="household">
+            <div class="choice-grid household-grid">
+              <button type="button" class="choice-card" data-value="Solo io">
+                <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="10" r="5"/><path d="M7 27c.8-6 4.2-9 9-9s8.2 3 9 9"/></svg></span>
+                <strong>Solo io</strong>
+              </button>
+              <button type="button" class="choice-card" data-value="Io e il mio partner">
+                <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="4"/><circle cx="22" cy="11" r="4"/><path d="M3.5 27c.7-5.4 3.3-8 7.5-8 2.4 0 4.3.8 5.5 2.3M28.5 27c-.7-5.4-3.3-8-7.5-8-2.4 0-4.3.8-5.5 2.3"/></svg></span>
+                <strong>Io e il mio partner</strong>
+              </button>
+              <button type="button" class="choice-card" data-value="Famiglia">
+                <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 15 16 6l11 9v11H5z"/><path d="M12 26v-7h8v7"/></svg></span>
+                <strong>La mia famiglia</strong>
+              </button>
+              <button type="button" class="choice-card" data-value="Io e dei coinquilini">
+                <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="9" cy="11" r="3.5"/><circle cx="16" cy="9" r="4"/><circle cx="23" cy="11" r="3.5"/><path d="M2.5 27c.5-4.7 2.7-7 6.5-7M29.5 27c-.5-4.7-2.7-7-6.5-7M8 27c.7-6 3.3-9 8-9s7.3 3 8 9"/></svg></span>
+                <strong>Io e dei coinquilini</strong>
+              </button>
+            </div>
+
+            <div class="choice-divider"><span>Oppure</span></div>
+            <button type="button" class="proxy-choice" data-value="Cerco per un'altra persona">
+              <span>Sto cercando casa per un’altra persona</span><span aria-hidden="true">→</span>
+            </button>
+          </div>
+
+          <div class="proxy-household-options" id="proxyHouseholdOptions" hidden>
+            <p class="field-title">E chi abiterà nella casa?</p>
+            <div class="pill-row single-choice" data-group="proxyHousehold">
+              <button type="button" class="pill" data-value="Una persona sola">Una persona sola</button>
+              <button type="button" class="pill" data-value="Con il partner">Con il partner</button>
+              <button type="button" class="pill" data-value="Con la famiglia">Con la famiglia</button>
+              <button type="button" class="pill" data-value="Con coinquilini">Con coinquilini</button>
+            </div>
           </div>
         </section>
 
         <section class="wizard-step" data-step="2">
           <p class="step-intro">Puoi scegliere più soluzioni se sei disposto a valutarle.</p>
           <div class="choice-grid multi-choice" data-group="types">
-            <button type="button" class="choice-card" data-value="Stanza"><span>🛏️</span><strong>Stanza</strong></button>
-            <button type="button" class="choice-card" data-value="Monolocale"><span>▣</span><strong>Monolocale</strong></button>
-            <button type="button" class="choice-card" data-value="Appartamento"><span>⌂</span><strong>Appartamento</strong></button>
+            <button type="button" class="choice-card" data-value="Stanza">
+              <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 23V12M27 23V15M5 19h22M9 16v-5h8a5 5 0 0 1 5 5"/><path d="M5 23v3M27 23v3"/></svg></span>
+              <strong>Stanza</strong>
+            </button>
+            <button type="button" class="choice-card" data-value="Monolocale">
+              <span class="choice-icon" aria-hidden="true"><rect x="6" y="6" width="20" height="20" rx="3"/><path d="M16 6v20M6 17h20"/></svg></span>
+              <strong>Monolocale</strong>
+            </button>
+            <button type="button" class="choice-card" data-value="Appartamento">
+              <span class="choice-icon" aria-hidden="true"><path d="M5 14 16 5l11 9v13H5z"/><path d="M10 27V17h12v10M13 21h6"/></svg></span>
+              <strong>Appartamento</strong>
+            </button>
           </div>
           <div class="room-options" id="roomOptions" hidden>
             <p class="field-title">Se cerchi una stanza</p>
@@ -244,6 +281,6 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

@@ -10,6 +10,7 @@ const previousButton = document.getElementById("previousButton");
 const nextButton = document.getElementById("nextButton");
 const closeDialogButton = document.getElementById("closeDialog");
 const roomOptions = document.getElementById("roomOptions");
+const proxyHouseholdOptions = document.getElementById("proxyHouseholdOptions");
 const summary = document.getElementById("searchSummary");
 const savedArea = document.getElementById("savedArea");
 const savedGrid = document.getElementById("savedGrid");
@@ -45,6 +46,9 @@ if (loginButton) {
 
 closeDialogButton.addEventListener("click", () => dialog.close());
 
+wizard.addEventListener("input", updateNextButtonState);
+wizard.addEventListener("change", updateNextButtonState);
+
 dialog.addEventListener("click", event => {
   const rect = dialog.getBoundingClientRect();
   const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
@@ -54,9 +58,12 @@ dialog.addEventListener("click", event => {
 [...document.querySelectorAll(".single-choice")].forEach(group => {
   group.addEventListener("click", event => {
     const button = event.target.closest("[data-value]");
-    if (!button) return;
-    group.querySelectorAll("[data-value]").forEach(item => item.classList.remove("selected"));
+    if (!button || !group.contains(button)) return;
+    group.querySelectorAll(":scope > [data-value], :scope > .choice-grid > [data-value]").forEach(item => item.classList.remove("selected"));
     button.classList.add("selected");
+
+    if (group.dataset.group === "household") updateProxyHouseholdOptions();
+    updateNextButtonState();
   });
 });
 
@@ -66,6 +73,7 @@ dialog.addEventListener("click", event => {
     if (!button) return;
     button.classList.toggle("selected");
     if (group.dataset.group === "types") updateRoomOptions();
+    updateNextButtonState();
   });
 });
 
@@ -78,6 +86,32 @@ function updateRoomOptions() {
     const roomGroup = document.querySelector('[data-group="roomPreferences"]');
     if (roomGroup) roomGroup.querySelectorAll(".selected").forEach(item => item.classList.remove("selected"));
   }
+}
+
+function updateProxyHouseholdOptions() {
+  const searchingForSomeoneElse = getSelectedOne("household") === "Cerco per un'altra persona";
+  proxyHouseholdOptions.hidden = !searchingForSomeoneElse;
+
+  if (!searchingForSomeoneElse) {
+    const proxyGroup = document.querySelector('[data-group="proxyHousehold"]');
+    if (proxyGroup) proxyGroup.querySelectorAll(".selected").forEach(item => item.classList.remove("selected"));
+  }
+}
+
+function updateNextButtonState() {
+  let enabled = true;
+
+  if (currentStep === 1) {
+    const household = getSelectedOne("household");
+    enabled = Boolean(household);
+    if (household === "Cerco per un'altra persona") enabled = Boolean(getSelectedOne("proxyHousehold"));
+  } else if (currentStep === 2) {
+    enabled = getSelected("types").length > 0;
+  } else if (currentStep === 3) {
+    enabled = Boolean(wizard.elements.city.value.trim());
+  }
+
+  nextButton.disabled = !enabled;
 }
 
 previousButton.addEventListener("click", () => {
@@ -106,13 +140,21 @@ function updateWizard() {
   wizardTitle.textContent = stepTitles[currentStep - 1];
   previousButton.disabled = currentStep === 1;
   nextButton.textContent = currentStep === 5 ? "Crea la ricerca" : "Continua";
+  updateNextButtonState();
   document.querySelector(".wizard-body").scrollTop = 0;
 }
 
 function validateStep(step) {
-  if (step === 1 && !getSelectedOne("household")) {
-    showToast("Scegli chi abiterà nella nuova casa.");
-    return false;
+  if (step === 1) {
+    const household = getSelectedOne("household");
+    if (!household) {
+      showToast("Scegli chi abiterà nella nuova casa.");
+      return false;
+    }
+    if (household === "Cerco per un'altra persona" && !getSelectedOne("proxyHousehold")) {
+      showToast("Indica chi abiterà nella casa.");
+      return false;
+    }
   }
 
   if (step === 2 && getSelected("types").length === 0) {
@@ -156,6 +198,7 @@ function collectData() {
     id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     createdAt: new Date().toISOString(),
     household: getSelectedOne("household"),
+    proxyHousehold: getSelectedOne("proxyHousehold"),
     types: getSelected("types"),
     roomPreferences: getSelected("roomPreferences"),
     city: wizard.elements.city.value.trim(),
@@ -172,7 +215,7 @@ function collectData() {
 function buildSummary() {
   const data = collectData();
   const rows = [
-    ["Per chi", data.household],
+    ["Per chi", data.household === "Cerco per un'altra persona" && data.proxyHousehold ? `Un’altra persona · ${data.proxyHousehold}` : data.household],
     ["Tipo", data.types.join(" · ")],
     ["Dove", [data.city, data.importantPlace].filter(Boolean).join(" · ")],
     ["Spostamenti", [data.travelMode, data.maxTravel].filter(Boolean).join(" · ") || "Nessun limite indicato"],
@@ -225,6 +268,7 @@ function normalizeSearch(search) {
     id: search.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     createdAt: search.createdAt || new Date().toISOString(),
     household: search.household || "Da definire",
+    proxyHousehold: search.proxyHousehold || "",
     types: types.length ? types : ["Casa"],
     roomPreferences: Array.isArray(search.roomPreferences) ? search.roomPreferences : [],
     city: search.city || search.searchCity || "",
@@ -295,6 +339,7 @@ function resetWizard() {
   wizard.reset();
   wizard.querySelectorAll(".selected").forEach(item => item.classList.remove("selected"));
   roomOptions.hidden = true;
+  proxyHouseholdOptions.hidden = true;
   summary.innerHTML = "";
   updateWizard();
 }

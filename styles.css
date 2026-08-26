@@ -96,7 +96,9 @@ a { color: inherit; text-decoration: none; }
 .hero-proof span::before { content: "✓"; margin-right: 7px; color: var(--green-700); font-weight: 900; }
 
 .product-demo { position: relative; display: grid; gap: 12px; padding: 18px; border: 1px solid var(--line); border-radius: 28px; background: rgba(255,255,255,.9); box-shadow: var(--shadow); }
-.demo-kicker { position: absolute; top: -37px; right: 10px; color: var(--green-700); font-size: 14px; font-weight: 820; transform: rotate(-2deg); }
+.demo-label { position: absolute; top: -54px; right: 4px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; color: var(--green-800); }
+.demo-label span { padding: 5px 9px; border: 1px solid #cfe5dc; border-radius: 999px; background: #fff; font-size: 10px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.demo-label strong { font-size: 13px; font-weight: 820; }
 .activity-card { position: relative; display: grid; grid-template-columns: 42px 1fr; gap: 12px; padding: 14px; background: #fff; border: 1px solid #e5efeb; border-radius: 18px; box-shadow: var(--shadow-soft); }
 .activity-card::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px; border-radius: 3px; background: var(--green-500); }
 .status-waiting::before { background: #e8ae27; }
@@ -192,10 +194,19 @@ a { color: inherit; text-decoration: none; }
 .wizard-step.active { display: block; }
 .step-intro { margin: 0 0 22px; color: var(--muted); line-height: 1.55; }
 .choice-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
-.choice-card { min-height: 104px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; padding: 17px; text-align: left; border: 1px solid var(--line); border-radius: 17px; background: #fff; color: var(--ink); }
-.choice-card > span { font-size: 23px; }
+.choice-card { position: relative; min-height: 92px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 9px; padding: 16px; text-align: left; border: 1px solid var(--line); border-radius: 17px; background: #fff; color: var(--ink); }
+.choice-icon { width: 26px; height: 26px; display: grid; place-items: center; color: var(--green-800); }
+.choice-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.choice-card.selected::after { content: "✓"; position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--green-800); color: #fff; font-size: 12px; font-weight: 900; }
 .choice-card:hover, .choice-card.selected, .pill.selected { border-color: var(--green-700); background: var(--green-50); box-shadow: inset 0 0 0 1px var(--green-700); }
 .choice-card.selected strong, .pill.selected { color: var(--green-900); }
+.household-choice-group { display: grid; gap: 14px; }
+.choice-divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.choice-divider::before, .choice-divider::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+.proxy-choice { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: #fff; color: var(--green-900); font-weight: 800; text-align: left; }
+.proxy-choice:hover, .proxy-choice.selected { border-color: var(--green-700); background: var(--green-50); box-shadow: inset 0 0 0 1px var(--green-700); }
+.proxy-household-options { margin-top: 18px; padding: 17px; border: 1px solid #dcebe5; border-radius: 15px; background: #f8fbfa; }
+.proxy-household-options .field-title { margin-bottom: 11px; }
 .room-options { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
 .field-title { margin: 0 0 12px; color: var(--green-950); font-weight: 850; }
 .pill-row { display: flex; flex-wrap: wrap; gap: 9px; }
@@ -248,7 +259,8 @@ textarea { resize: vertical; }
   .quiet-link { width: fit-content; }
   .hero-proof { gap: 8px 14px; }
   .product-demo { margin-top: 28px; padding: 12px; border-radius: 22px; }
-  .demo-kicker { top: -30px; font-size: 12px; }
+  .demo-label { position: static; align-items: flex-start; margin-bottom: 2px; }
+  .demo-label strong { font-size: 12px; }
   .activity-card { grid-template-columns: 34px 1fr; padding: 11px; }
   .avatar { width: 32px; height: 32px; }
   .property-row { grid-template-columns: 62px 1fr; }
