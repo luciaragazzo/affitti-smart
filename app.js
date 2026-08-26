@@ -1,1939 +1,318 @@
-const searchDialog =
-  document.getElementById("searchDialog");
+const STORAGE_KEY = "affitti-smart-searches-v2";
 
-const searchWizard =
-  document.getElementById("searchWizard");
-
-const wizardSteps = [
-  ...document.querySelectorAll(".wizard-step")
-];
-
-const propertyChoices = [
-  ...document.querySelectorAll(".property-choice")
-];
-
-const roomFilters =
-  document.getElementById("roomFilters");
-
-const progressBar =
-  document.getElementById("progressBar");
-
-const wizardTitle =
-  document.getElementById("wizardTitle");
-
-const previousButton =
-  document.getElementById("previousButton");
-
-const nextButton =
-  document.getElementById("nextButton");
-
-const closeDialog =
-  document.getElementById("closeDialog");
-
-const searchSummary =
-  document.getElementById("searchSummary");
-
-const betaForm =
-  document.getElementById("betaForm");
-
-const betaMessage =
-  document.getElementById("betaMessage");
-
-const scrollHint =
-  document.getElementById("scrollHint");
-
-const poiCategories = [
-  ...document.querySelectorAll(".poi-category")
-];
-
-const poiResults =
-  document.getElementById("poiResults");
-
-const distanceBlock =
-  document.getElementById("distanceBlock");
-
-const savedSearches =
-  document.getElementById("savedSearches");
-
-const mySearches =
-  document.getElementById("mySearches");
-
-const newSearchFromDashboard =
-  document.getElementById("newSearchFromDashboard");
-
-const advancedMore =
-  document.querySelector(".advanced-more");
+const dialog = document.getElementById("searchDialog");
+const wizard = document.getElementById("searchWizard");
+const steps = [...document.querySelectorAll(".wizard-step")];
+const progressBar = document.getElementById("progressBar");
+const stepLabel = document.getElementById("stepLabel");
+const wizardTitle = document.getElementById("wizardTitle");
+const previousButton = document.getElementById("previousButton");
+const nextButton = document.getElementById("nextButton");
+const closeDialogButton = document.getElementById("closeDialog");
+const roomOptions = document.getElementById("roomOptions");
+const summary = document.getElementById("searchSummary");
+const savedArea = document.getElementById("savedArea");
+const savedGrid = document.getElementById("savedGrid");
+const toast = document.getElementById("toast");
 
 let currentStep = 1;
+let searches = loadSearches();
 
-let propertyType = "Stanza";
-
-let selectedPoiCategory = "";
-
-let searches =
-  loadSearches();
-
-
-const wizardTitles = [
-  "Dove cerchi?",
-  "Cosa cerchi?",
-  "Budget e disponibilità",
-  "Vuoi aggiungere altri filtri?",
-  "Controlla la tua ricerca"
+const stepTitles = [
+  "Chi abiterà nella nuova casa?",
+  "Che tipo di casa può andare bene?",
+  "Dove deve essere comoda?",
+  "Quali esigenze deve rispettare?",
+  "La casa che stai cercando"
 ];
 
+function openWizard() {
+  resetWizard();
+  dialog.showModal();
+}
 
-/* =========================
-   POI DEMO
-========================= */
+["heroStart", "bottomStart", "newSearchButton"].forEach(id => {
+  const element = document.getElementById(id);
+  if (element) element.addEventListener("click", openWizard);
+});
 
-const poiDatabase = {
+const loginButton = document.getElementById("loginButton");
+if (loginButton) {
+  loginButton.addEventListener("click", () => {
+    showToast("L’accesso con account arriverà nella prossima fase della beta.");
+  });
+}
 
-  prato: {
+closeDialogButton.addEventListener("click", () => dialog.close());
 
-    "Stazione": [
-      "Stazione di Prato Centrale",
-      "Stazione di Prato Porta al Serraglio",
-      "Stazione di Prato Borgonuovo"
-    ],
+dialog.addEventListener("click", event => {
+  const rect = dialog.getBoundingClientRect();
+  const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+  if (outside) dialog.close();
+});
 
-    "Università": [
-      "PIN - Polo Universitario Città di Prato"
-    ],
+[...document.querySelectorAll(".single-choice")].forEach(group => {
+  group.addEventListener("click", event => {
+    const button = event.target.closest("[data-value]");
+    if (!button) return;
+    group.querySelectorAll("[data-value]").forEach(item => item.classList.remove("selected"));
+    button.classList.add("selected");
+  });
+});
 
-    "Ospedale": [
-      "Ospedale Santo Stefano"
-    ],
+[...document.querySelectorAll(".multi-choice")].forEach(group => {
+  group.addEventListener("click", event => {
+    const button = event.target.closest("[data-value]");
+    if (!button) return;
+    button.classList.toggle("selected");
+    if (group.dataset.group === "types") updateRoomOptions();
+  });
+});
 
-    "Centro commerciale": [
-      "Parco Prato",
-      "Centro Commerciale Prato Est"
-    ],
+function updateRoomOptions() {
+  const selectedTypes = getSelected("types");
+  const hasRoom = selectedTypes.includes("Stanza");
+  roomOptions.hidden = !hasRoom;
 
-    "Parco": [
-      "Parco delle Cascine di Tavola",
-      "Parco della Liberazione e della Pace"
-    ],
-
-    "Scuola": [
-      "Centro scolastico Datini",
-      "Istituto Gramsci-Keynes"
-    ]
-
-  },
-
-
-  latina: {
-
-    "Stazione": [
-      "Stazione di Latina"
-    ],
-
-    "Università": [
-      "Sapienza Università di Roma - Polo di Latina"
-    ],
-
-    "Ospedale": [
-      "Ospedale Santa Maria Goretti"
-    ],
-
-    "Centro commerciale": [
-      "Centro Commerciale Latinafiori",
-      "Centro Commerciale Morbella"
-    ],
-
-    "Parco": [
-      "Parco Falcone e Borsellino",
-      "Parco San Marco"
-    ],
-
-    "Scuola": [
-      "Liceo G.B. Grassi",
-      "Istituto Vittorio Veneto Salvemini"
-    ]
-
-  },
-
-
-  roma: {
-
-    "Stazione": [
-      "Roma Termini",
-      "Roma Tiburtina",
-      "Roma Ostiense"
-    ],
-
-    "Università": [
-      "Sapienza Università di Roma",
-      "Università Roma Tre",
-      "Università Tor Vergata"
-    ],
-
-    "Ospedale": [
-      "Policlinico Gemelli",
-      "Policlinico Umberto I",
-      "Ospedale San Camillo"
-    ],
-
-    "Centro commerciale": [
-      "Porta di Roma",
-      "Euroma2",
-      "RomaEst"
-    ],
-
-    "Parco": [
-      "Villa Borghese",
-      "Villa Doria Pamphilj",
-      "Parco degli Acquedotti"
-    ],
-
-    "Scuola": [
-      "Zona scuole Roma centro"
-    ]
-
+  if (!hasRoom) {
+    const roomGroup = document.querySelector('[data-group="roomPreferences"]');
+    if (roomGroup) roomGroup.querySelectorAll(".selected").forEach(item => item.classList.remove("selected"));
   }
+}
 
-};
-
-
-/* =========================
-   APERTURA WIZARD
-========================= */
-
-function openSearchWizard() {
-
-  currentStep = 1;
-
+previousButton.addEventListener("click", () => {
+  if (currentStep === 1) return;
+  currentStep -= 1;
   updateWizard();
-
-  searchDialog.showModal();
-
-}
-
-
-[
-  "headerStart",
-  "heroStart",
-  "phoneSearchButton"
-].forEach(id => {
-
-  const button =
-    document.getElementById(id);
-
-  if (button) {
-
-    button.addEventListener(
-      "click",
-      openSearchWizard
-    );
-
-  }
-
 });
 
+nextButton.addEventListener("click", () => {
+  if (!validateStep(currentStep)) return;
 
-if (newSearchFromDashboard) {
-
-  newSearchFromDashboard.addEventListener(
-    "click",
-    openSearchWizard
-  );
-
-}
-advancedMore.addEventListener(
-  "toggle",
-  () => {
-
-    if (advancedMore.open) {
-
-      setTimeout(() => {
-
-        advancedMore.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
-        });
-
-      }, 120);
-
-    }
-
-  }
-);
-
-/* =========================
-   SCROLL HOME
-========================= */
-
-function scrollToHowItWorks() {
-
-  const section =
-    document.getElementById("howItWorks");
-
-  if (section) {
-
-    section.scrollIntoView({
-      behavior: "smooth"
-    });
-
-  }
-
-}
-
-
-const discoverButton =
-  document.getElementById("discoverButton");
-
-if (discoverButton) {
-
-  discoverButton.addEventListener(
-    "click",
-    scrollToHowItWorks
-  );
-
-}
-
-
-if (scrollHint) {
-
-  scrollHint.addEventListener(
-    "click",
-    scrollToHowItWorks
-  );
-
-}
-
-
-/* =========================
-   CHIUSURA MODALE
-========================= */
-
-if (closeDialog) {
-
-  closeDialog.addEventListener(
-    "click",
-    () => {
-
-      searchDialog.close();
-
-    }
-  );
-
-}
-
-
-/* =========================
-   TIPO IMMOBILE
-========================= */
-
-propertyChoices.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      propertyChoices.forEach(
-        choice => {
-
-          choice.classList.remove(
-            "active"
-          );
-
-        }
-      );
-
-      button.classList.add(
-        "active"
-      );
-
-      propertyType =
-        button.dataset.type;
-
-      updateDynamicFilters();
-
-    }
-  );
-
-});
-
-
-function updateDynamicFilters() {
-
-  if (!roomFilters) {
+  if (currentStep < steps.length) {
+    currentStep += 1;
+    if (currentStep === 5) buildSummary();
+    updateWizard();
     return;
   }
 
-  if (propertyType === "Stanza") {
-
-    roomFilters.style.display =
-      "block";
-
-  } else {
-
-    roomFilters.style.display =
-      "none";
-
-  }
-
-}
-
-
-/* =========================
-   POI
-========================= */
-
-poiCategories.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      const city =
-        searchWizard.elements
-          .searchCity
-          .value
-          .trim();
-
-      if (!city) {
-
-        alert(
-          "Inserisci prima la città."
-        );
-
-        searchWizard.elements
-          .searchCity
-          .focus();
-
-        return;
-
-      }
-
-      poiCategories.forEach(
-        category => {
-
-          category.classList.remove(
-            "active"
-          );
-
-        }
-      );
-
-      button.classList.add(
-        "active"
-      );
-
-      selectedPoiCategory =
-        button.dataset.poiCategory;
-
-      populatePoiOptions();
-
-    }
-  );
-
+  saveCurrentSearch();
 });
-
-
-function populatePoiOptions() {
-
-  const city =
-    normalizeCity(
-      searchWizard.elements
-        .searchCity
-        .value
-    );
-
-  const poiSelect =
-    searchWizard.elements.poi;
-
-  poiSelect.innerHTML =
-    '<option value="">Seleziona</option>';
-
-  let options = [];
-
-  if (
-    poiDatabase[city] &&
-    poiDatabase[city][selectedPoiCategory]
-  ) {
-
-    options =
-      poiDatabase[city][
-        selectedPoiCategory
-      ];
-
-  } else {
-
-  options = [];
-
-}
-
-  options.forEach(name => {
-
-    const option =
-      document.createElement(
-        "option"
-      );
-
-    option.value = name;
-
-    option.textContent = name;
-
-    poiSelect.appendChild(
-      option
-    );
-
-  });
-const oldMessage =
-  poiResults.querySelector(
-    ".poi-demo-message"
-  );
-
-if (oldMessage) {
-  oldMessage.remove();
-}
-
-const poiLabel =
-  poiSelect.closest("label");
-
-
-if (options.length === 0) {
-
-  poiLabel.style.display =
-    "none";
-
-  const message =
-    document.createElement(
-      "div"
-    );
-
-  message.className =
-    "poi-demo-message";
-
-  message.innerHTML =
-    "<strong>Nessun suggerimento demo per questa categoria.</strong><br>" +
-    "Questo non significa che il luogo non esista. " +
-    "Puoi inserire liberamente un indirizzo, una zona o un punto di riferimento nel campo sopra.";
-
-  message.style.padding =
-    "12px 14px";
-
-  message.style.marginTop =
-    "8px";
-
-  message.style.background =
-    "#ffffff";
-
-  message.style.border =
-    "1px solid #d7e7e3";
-
-  message.style.borderRadius =
-    "12px";
-
-  message.style.color =
-    "#70827e";
-
-  message.style.fontSize =
-    "13px";
-
-  message.style.lineHeight =
-    "1.5";
-
-  poiResults.appendChild(
-    message
-  );
-
-} else {
-
-  poiLabel.style.display =
-    "flex";
-
-}
-
- poiResults.hidden = false;
-
-distanceBlock.hidden = true;
-
-setTimeout(() => {
-  poiResults.scrollIntoView({
-    behavior: "smooth",
-    block: "nearest"
-  });
-}, 100);
-
-}
-
-
-searchWizard.elements.poi
-  .addEventListener(
-    "change",
-    event => {
-
-      distanceBlock.hidden =
-        !event.target.value;
-
-      if (event.target.value) {
-
-        setTimeout(() => {
-          distanceBlock.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
-          });
-        }, 100);
-
-      }
-
-    }
-  );
-
-
-searchWizard.elements.searchCity
-  .addEventListener(
-    "input",
-    () => {
-
-      resetPoiSelection();
-
-    }
-  );
-
-
-function resetPoiSelection() {
-
-  selectedPoiCategory = "";
-
-  poiCategories.forEach(
-    category => {
-
-      category.classList.remove(
-        "active"
-      );
-
-    }
-  );
-
-  poiResults.hidden = true;
-
-  distanceBlock.hidden = true;
-
-  searchWizard.elements.poi
-    .innerHTML =
-      '<option value="">Seleziona</option>';
-
-}
-
-
-/* =========================
-   NAVIGAZIONE WIZARD
-========================= */
-
-previousButton.addEventListener(
-  "click",
-  () => {
-
-    if (currentStep > 1) {
-
-      currentStep--;
-
-      updateWizard();
-
-    }
-
-  }
-);
-
-
-nextButton.addEventListener(
-  "click",
-  () => {
-
-    if (!validateCurrentStep()) {
-
-      return;
-
-    }
-
-    if (currentStep < 5) {
-
-      currentStep++;
-
-      if (currentStep === 5) {
-
-        buildSearchSummary();
-
-      }
-
-      updateWizard();
-
-    } else {
-
-      activateSearch();
-
-    }
-
-  }
-);
-
-
-/* =========================
-   AGGIORNA WIZARD
-========================= */
 
 function updateWizard() {
-
-  wizardSteps.forEach(step => {
-
-    const stepNumber =
-      Number(
-        step.dataset.step
-      );
-
-    step.classList.toggle(
-      "active",
-      stepNumber === currentStep
-    );
-
-  });
-
-
-  wizardTitle.textContent =
-    wizardTitles[
-      currentStep - 1
-    ];
-
-
-  progressBar.style.width =
-    `${currentStep * 20}%`;
-
-
-  previousButton.disabled =
-    currentStep === 1;
-
-
-  if (currentStep === 5) {
-
-    nextButton.textContent =
-      "Attiva ricerca";
-
-  } else {
-
-    nextButton.textContent =
-      "Continua";
-
-  }
-
-
-  const wizardContent =
-    document.querySelector(
-      ".wizard-content"
-    );
-
-  if (wizardContent) {
-
-    wizardContent.scrollTop = 0;
-
-  }
-
+  steps.forEach((step, index) => step.classList.toggle("active", index + 1 === currentStep));
+  progressBar.style.width = `${currentStep * 20}%`;
+  stepLabel.textContent = `PASSO ${currentStep} DI 5`;
+  wizardTitle.textContent = stepTitles[currentStep - 1];
+  previousButton.disabled = currentStep === 1;
+  nextButton.textContent = currentStep === 5 ? "Crea la ricerca" : "Continua";
+  document.querySelector(".wizard-body").scrollTop = 0;
 }
 
+function validateStep(step) {
+  if (step === 1 && !getSelectedOne("household")) {
+    showToast("Scegli chi abiterà nella nuova casa.");
+    return false;
+  }
 
-/* =========================
-   VALIDAZIONE
-========================= */
+  if (step === 2 && getSelected("types").length === 0) {
+    showToast("Scegli almeno un tipo di casa.");
+    return false;
+  }
 
-function validateCurrentStep() {
-
-  if (currentStep === 1) {
-
-    const city =
-      searchWizard.elements
-        .searchCity
-        .value
-        .trim();
-
+  if (step === 3) {
+    const city = wizard.elements.city.value.trim();
     if (!city) {
-
-      alert(
-        "Inserisci la città in cui stai cercando."
-      );
-
-      searchWizard.elements
-        .searchCity
-        .focus();
-
+      showToast("Inserisci la città in cui stai cercando.");
+      wizard.elements.city.focus();
       return false;
-
     }
-
   }
 
-
-  if (currentStep === 3) {
-
-    const budget =
-      searchWizard.elements
-        .budget
-        .value;
-
-    if (
-      budget &&
-      Number(budget) <= 0
-    ) {
-
-      alert(
-        "Inserisci un budget valido."
-      );
-
+  if (step === 4) {
+    const budget = wizard.elements.budget.value;
+    if (budget && Number(budget) <= 0) {
+      showToast("Inserisci un budget valido.");
+      wizard.elements.budget.focus();
       return false;
-
     }
-
   }
-
 
   return true;
-
 }
 
-
-/* =========================
-   RIEPILOGO
-========================= */
-
-function buildSearchSummary() {
-
-  const data =
-    collectFormData();
-
-  const lines = [];
-
-
-  lines.push(`
-
-    <div>
-
-      <strong>
-        ${escapeHtml(data.propertyType)}
-        a
-        ${escapeHtml(data.city)}
-      </strong>
-
-    </div>
-
-  `);
-
-
-  if (data.addressZone) {
-
-    lines.push(`
-
-      <div>
-        📍 Zona o indirizzo:
-        <strong>
-          ${escapeHtml(
-            data.addressZone
-          )}
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  if (data.poi) {
-
-    lines.push(`
-
-      <div>
-        📍 Punto di interesse:
-        <strong>
-          ${escapeHtml(data.poi)}
-        </strong>
-      </div>
-
-      <div>
-        Entro
-        <strong>
-          ${escapeHtml(
-            data.distance
-          )} km
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  if (data.budget) {
-
-    lines.push(`
-
-      <div>
-        💶 Budget massimo:
-        <strong>
-          €${escapeHtml(
-            data.budget
-          )}/mese
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  if (data.availableFrom) {
-
-    lines.push(`
-
-      <div>
-        📅 Disponibile da:
-        <strong>
-          ${formatDate(
-            data.availableFrom
-          )}
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  const generalPreferences = [];
-
-  if (data.petFriendly) {
-    generalPreferences.push(
-      "animali ammessi"
-    );
-  }
-
-  if (data.furnished) {
-    generalPreferences.push(
-      "arredato"
-    );
-  }
-
-
-  if (generalPreferences.length) {
-
-    lines.push(`
-
-      <div>
-        🏡 Preferenze:
-        <strong>
-          ${generalPreferences
-            .map(escapeHtml)
-            .join(", ")
-          }
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  const roomPreferences = [];
-
-  if (
-    data.propertyType === "Stanza"
-  ) {
-
-    if (data.womenOnly) {
-      roomPreferences.push(
-        "solo donne"
-      );
-    }
-
-    if (data.menOnly) {
-      roomPreferences.push(
-        "solo uomini"
-      );
-    }
-
-    if (data.mixed) {
-      roomPreferences.push(
-        "coinquilini misti"
-      );
-    }
-
-    if (data.privateBathroom) {
-      roomPreferences.push(
-        "bagno privato"
-      );
-    }
-
-    if (data.couplesAllowed) {
-      roomPreferences.push(
-        "coppie ammesse"
-      );
-    }
-
-  }
-
-
-  if (roomPreferences.length) {
-
-    lines.push(`
-
-      <div>
-        🛏 Preferenze stanza:
-        <strong>
-          ${roomPreferences
-            .map(escapeHtml)
-            .join(", ")
-          }
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  const advanced =
-    getAdvancedPreferences(
-      data
-    );
-
-
-  if (advanced.length) {
-
-    lines.push(`
-
-      <div>
-        ⚙️ Altri filtri:
-        <strong>
-          ${advanced
-            .map(escapeHtml)
-            .join(", ")
-          }
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  if (data.contractType) {
-
-    lines.push(`
-
-      <div>
-        📄 Contratto:
-        <strong>
-          ${escapeHtml(
-            data.contractType
-          )}
-        </strong>
-      </div>
-
-    `);
-
-  }
-
-
-  searchSummary.innerHTML =
-    lines.join("");
-
+function getSelected(groupName) {
+  const group = document.querySelector(`[data-group="${groupName}"]`);
+  if (!group) return [];
+  return [...group.querySelectorAll(".selected")].map(item => item.dataset.value);
 }
 
+function getSelectedOne(groupName) {
+  return getSelected(groupName)[0] || "";
+}
 
-/* =========================
-   RACCOLTA DATI
-========================= */
-
-function collectFormData() {
-
-  const elements =
-    searchWizard.elements;
-
-
+function collectData() {
   return {
-
-    city:
-      elements.searchCity
-        .value
-        .trim(),
-
-    addressZone:
-      elements.addressZone
-        .value
-        .trim(),
-
-    poi:
-      elements.poi
-        .value,
-
-    poiCategory:
-      selectedPoiCategory,
-
-    distance:
-      elements.distance
-        .value,
-
-    propertyType,
-
-    budget:
-      elements.budget
-        .value,
-
-    availableFrom:
-      elements.availableFrom
-        .value,
-
-    petFriendly:
-      elements.petFriendly
-        .checked,
-
-    furnished:
-      elements.furnished
-        .checked,
-
-    womenOnly:
-      propertyType === "Stanza"
-        ? elements.womenOnly
-            .checked
-        : false,
-
-    menOnly:
-      propertyType === "Stanza"
-        ? elements.menOnly
-            .checked
-        : false,
-
-    mixed:
-      propertyType === "Stanza"
-        ? elements.mixed
-            .checked
-        : false,
-
-    privateBathroom:
-      propertyType === "Stanza"
-        ? elements.privateBathroom
-            .checked
-        : false,
-
-    couplesAllowed:
-      propertyType === "Stanza"
-        ? elements.couplesAllowed
-            .checked
-        : false,
-
-    utilitiesIncluded:
-      elements.utilitiesIncluded
-        .checked,
-
-    privateOnly:
-      elements.privateOnly
-        .checked,
-
-    noAgencyFees:
-      elements.noAgencyFees
-        .checked,
-
-    balcony:
-      elements.balcony
-        .checked,
-
-    elevator:
-      elements.elevator
-        .checked,
-
-    parking:
-      elements.parking
-        .checked,
-
-    airConditioning:
-      elements.airConditioning
-        .checked,
-
-    washingMachine:
-      elements.washingMachine
-        .checked,
-
-    dishwasher:
-      elements.dishwasher
-        .checked,
-
-    wifiIncluded:
-      elements.wifiIncluded
-        .checked,
-
-    noGroundFloor:
-      elements.noGroundFloor
-        .checked,
-
-    noBasement:
-      elements.noBasement
-        .checked,
-
-    contractType:
-      elements.contractType
-        .value
-
+    id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    createdAt: new Date().toISOString(),
+    household: getSelectedOne("household"),
+    types: getSelected("types"),
+    roomPreferences: getSelected("roomPreferences"),
+    city: wizard.elements.city.value.trim(),
+    importantPlace: wizard.elements.importantPlace.value.trim(),
+    travelMode: wizard.elements.travelMode.value,
+    maxTravel: wizard.elements.maxTravel.value,
+    budget: wizard.elements.budget.value,
+    availableFrom: wizard.elements.availableFrom.value,
+    mustHave: getSelected("mustHave"),
+    notes: wizard.elements.notes.value.trim()
   };
-
 }
 
-
-/* =========================
-   FILTRI AVANZATI
-========================= */
-
-function getAdvancedPreferences(
-  data
-) {
-
-  const preferences = [];
-
-  const mapping = [
-    [
-      "utilitiesIncluded",
-      "utenze incluse"
-    ],
-    [
-      "privateOnly",
-      "solo privati"
-    ],
-    [
-      "noAgencyFees",
-      "no commissioni agenzia"
-    ],
-    [
-      "balcony",
-      "balcone/terrazzo"
-    ],
-    [
-      "elevator",
-      "ascensore"
-    ],
-    [
-      "parking",
-      "posto auto/garage"
-    ],
-    [
-      "airConditioning",
-      "aria condizionata"
-    ],
-    [
-      "washingMachine",
-      "lavatrice"
-    ],
-    [
-      "dishwasher",
-      "lavastoviglie"
-    ],
-    [
-      "wifiIncluded",
-      "Wi-Fi incluso"
-    ],
-    [
-      "noGroundFloor",
-      "no piano terra"
-    ],
-    [
-      "noBasement",
-      "no seminterrato"
-    ]
+function buildSummary() {
+  const data = collectData();
+  const rows = [
+    ["Per chi", data.household],
+    ["Tipo", data.types.join(" · ")],
+    ["Dove", [data.city, data.importantPlace].filter(Boolean).join(" · ")],
+    ["Spostamenti", [data.travelMode, data.maxTravel].filter(Boolean).join(" · ") || "Nessun limite indicato"],
+    ["Budget", data.budget ? `Fino a €${escapeHtml(data.budget)}/mese` : "Da definire"],
+    ["Indispensabili", [...data.roomPreferences, ...data.mustHave].join(" · ") || "Nessuno indicato"]
   ];
 
+  if (data.notes) rows.push(["Note", data.notes]);
 
-  mapping.forEach(
-    ([key, label]) => {
-
-      if (data[key]) {
-
-        preferences.push(
-          label
-        );
-
-      }
-
-    }
-  );
-
-
-  return preferences;
-
+  summary.innerHTML = rows.map(([label, value]) => `
+    <div class="summary-row">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </div>
+  `).join("");
 }
 
-
-/* =========================
-   ATTIVA RICERCA
-========================= */
-
-function activateSearch() {
-
-  const formData =
-    collectFormData();
-
-
-  const searchData = {
-
-    id:
-      typeof crypto !== "undefined" &&
-      crypto.randomUUID
-        ? crypto.randomUUID()
-        : Date.now().toString(),
-
-    ...formData,
-
-    status:
-      "active",
-
-    createdAt:
-      new Date().toISOString()
-
-  };
-
-
-  searches.unshift(
-    searchData
-  );
-
-
-  saveSearches();
-
-  renderSearches();
-
-
-  searchDialog.close();
-
-
-  mySearches.hidden = false;
-
-
-  mySearches.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-
-
-  resetWizardForm();
-
+function saveCurrentSearch() {
+  const data = collectData();
+  searches.unshift(data);
+  persistSearches();
+  renderSavedSearches();
+  dialog.close();
+  savedArea.hidden = false;
+  savedArea.scrollIntoView({ behavior: "smooth", block: "start" });
+  showToast("Ricerca creata. Ora puoi iniziare ad aggiungere le case che trovi.");
 }
-
-
-/* =========================
-   SALVATAGGIO LOCALE
-========================= */
 
 function loadSearches() {
-
   try {
+    const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    if (Array.isArray(current) && current.length) return current.map(normalizeSearch);
 
-    const stored =
-      localStorage.getItem(
-        "affitti-smart-searches"
-      );
+    const legacy = JSON.parse(localStorage.getItem("affitti-smart-searches") || "[]");
+    if (!Array.isArray(legacy) || !legacy.length) return [];
 
-    if (!stored) {
-      return [];
-    }
-
-    const parsed =
-      JSON.parse(stored);
-
-    return Array.isArray(parsed)
-      ? parsed
-      : [];
-
+    const migrated = legacy.map(normalizeSearch);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+    return migrated;
   } catch {
-
     return [];
-
   }
-
 }
 
+function normalizeSearch(search) {
+  const typeValue = search.types || search.propertyTypes || search.propertyType || [];
+  const types = Array.isArray(typeValue) ? typeValue : [typeValue].filter(Boolean);
 
-function saveSearches() {
-
-  localStorage.setItem(
-    "affitti-smart-searches",
-    JSON.stringify(searches)
-  );
-
+  return {
+    id: search.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    createdAt: search.createdAt || new Date().toISOString(),
+    household: search.household || "Da definire",
+    types: types.length ? types : ["Casa"],
+    roomPreferences: Array.isArray(search.roomPreferences) ? search.roomPreferences : [],
+    city: search.city || search.searchCity || "",
+    importantPlace: search.importantPlace || search.addressZone || search.poi || "",
+    travelMode: search.travelMode || "",
+    maxTravel: search.maxTravel || (search.distance ? `Entro ${search.distance} km` : ""),
+    budget: search.budget || "",
+    availableFrom: search.availableFrom || search.available || "",
+    mustHave: Array.isArray(search.mustHave) ? search.mustHave : [],
+    notes: search.notes || ""
+  };
 }
 
+function persistSearches() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(searches));
+}
 
-/* =========================
-   RENDER LE MIE RICERCHE
-========================= */
-
-function renderSearches() {
-
-  if (!savedSearches) {
-    return;
-  }
-
-
+function renderSavedSearches() {
   if (!searches.length) {
-
-    savedSearches.innerHTML = "";
-
-    mySearches.hidden = true;
-
+    savedArea.hidden = true;
+    savedGrid.innerHTML = "";
     return;
-
   }
 
+  savedArea.hidden = false;
+  savedGrid.innerHTML = searches.map(search => {
+    const title = `${search.types.join(" / ")} · ${search.city}`;
+    const chips = [
+      search.budget ? `Max €${search.budget}` : "",
+      ...search.roomPreferences.slice(0, 2),
+      ...search.mustHave.slice(0, 2)
+    ].filter(Boolean);
 
-  mySearches.hidden = false;
-
-
-  savedSearches.innerHTML =
-    searches
-      .map(
-        search =>
-          buildSavedSearchCard(
-            search
-          )
-      )
-      .join("");
-
-
-  bindSearchCardActions();
-
-}
-
-
-function buildSavedSearchCard(
-  search
-) {
-
-  const location = [];
-
-  if (search.addressZone) {
-    location.push(
-      search.addressZone
-    );
-  }
-
-  if (search.poi) {
-    location.push(
-      search.poi
-    );
-  }
-
-
-  const statusLabel =
-    search.status === "paused"
-      ? "In pausa"
-      : "Ricerca attiva";
-
-
-  let details = "";
-
-
-  if (location.length) {
-
-    details += `
-
-      <p>
-        📍
-        ${escapeHtml(
-          location.join(" · ")
-        )}
-      </p>
-
-    `;
-
-  }
-
-
-  if (search.poi) {
-
-    details += `
-
-      <p>
-        Entro
-        ${escapeHtml(
-          search.distance
-        )} km
-      </p>
-
-    `;
-
-  }
-
-
-  if (search.budget) {
-
-    details += `
-
-      <p>
-        💶 Max
-        €${escapeHtml(
-          search.budget
-        )}/mese
-      </p>
-
-    `;
-
-  }
-
-
-  if (search.availableFrom) {
-
-    details += `
-
-      <p>
-        📅 Dal
-        ${formatDate(
-          search.availableFrom
-        )}
-      </p>
-
-    `;
-
-  }
-
-
-  if (search.petFriendly) {
-
-    details += `
-
-      <p>
-        🐾 Animali ammessi
-      </p>
-
-    `;
-
-  }
-
-
-  return `
-
-    <article
-      class="saved-search-card"
-      data-search-id="${
-        escapeHtml(search.id)
-      }"
-    >
-
-      <div class="saved-search-top">
-
-        <div>
-
-          <h3>
-            ${escapeHtml(
-              search.propertyType
-            )}
-            a
-            ${escapeHtml(
-              search.city
-            )}
-          </h3>
-
-          ${details}
-
+    return `
+      <article class="saved-search" data-search-id="${escapeHtml(search.id)}">
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(search.importantPlace || "Nessun luogo prioritario indicato")}</p>
+        <div class="saved-chips">${chips.map(chip => `<span>${escapeHtml(chip)}</span>`).join("")}</div>
+        <div class="saved-actions">
+          <button class="secondary-button open-search" type="button">Apri ricerca</button>
+          <button class="delete-button" type="button">Elimina</button>
         </div>
-
-
-        <span class="search-active">
-          ${
-            search.status === "paused"
-              ? "⏸"
-              : "●"
-          }
-          ${statusLabel}
-        </span>
-
-      </div>
-
-
-      <div class="saved-search-actions">
-
-        <button
-          class="secondary toggle-search"
-          type="button"
-        >
-          ${
-            search.status === "paused"
-              ? "Riattiva"
-              : "Metti in pausa"
-          }
-        </button>
-
-
-        <button
-          class="secondary delete-search"
-          type="button"
-        >
-          Elimina
-        </button>
-
-      </div>
-
-    </article>
-
-  `;
-
+      </article>
+    `;
+  }).join("");
 }
 
+savedGrid.addEventListener("click", event => {
+  const card = event.target.closest("[data-search-id]");
+  if (!card) return;
+  const id = card.dataset.searchId;
 
-/* =========================
-   AZIONI RICERCHE
-========================= */
-
-function bindSearchCardActions() {
-
-  document
-    .querySelectorAll(
-      ".saved-search-card"
-    )
-    .forEach(card => {
-
-      const id =
-        card.dataset.searchId;
-
-
-      const toggleButton =
-        card.querySelector(
-          ".toggle-search"
-        );
-
-
-      const deleteButton =
-        card.querySelector(
-          ".delete-search"
-        );
-
-
-      if (toggleButton) {
-
-        toggleButton.addEventListener(
-          "click",
-          () => {
-
-            toggleSearchStatus(id);
-
-          }
-        );
-
-      }
-
-
-      if (deleteButton) {
-
-        deleteButton.addEventListener(
-          "click",
-          () => {
-
-            deleteSearch(id);
-
-          }
-        );
-
-      }
-
-    });
-
-}
-
-
-function toggleSearchStatus(id) {
-
-  searches =
-    searches.map(search => {
-
-      if (search.id !== id) {
-        return search;
-      }
-
-      return {
-
-        ...search,
-
-        status:
-          search.status === "paused"
-            ? "active"
-            : "paused"
-
-      };
-
-    });
-
-
-  saveSearches();
-
-  renderSearches();
-
-}
-
-
-function deleteSearch(id) {
-
-  const confirmed =
-    confirm(
-      "Vuoi eliminare questa ricerca?"
-    );
-
-  if (!confirmed) {
+  if (event.target.closest(".delete-button")) {
+    searches = searches.filter(search => search.id !== id);
+    persistSearches();
+    renderSavedSearches();
+    showToast("Ricerca eliminata.");
     return;
   }
 
+  if (event.target.closest(".open-search")) {
+    showToast("La schermata operativa della ricerca è il prossimo modulo che realizzeremo.");
+  }
+});
 
-  searches =
-    searches.filter(
-      search =>
-        search.id !== id
-    );
-
-
-  saveSearches();
-
-  renderSearches();
-
-}
-
-
-/* =========================
-   RESET WIZARD
-========================= */
-
-function resetWizardForm() {
-
-  searchWizard.reset();
-
+function resetWizard() {
   currentStep = 1;
-
-  propertyType = "Stanza";
-
-  selectedPoiCategory = "";
-
-  propertyChoices.forEach(
-    choice => {
-
-      choice.classList.toggle(
-        "active",
-        choice.dataset.type === "Stanza"
-      );
-
-    }
-  );
-
-
-  resetPoiSelection();
-
-  updateDynamicFilters();
-
+  wizard.reset();
+  wizard.querySelectorAll(".selected").forEach(item => item.classList.remove("selected"));
+  roomOptions.hidden = true;
+  summary.innerHTML = "";
   updateWizard();
-
 }
 
-
-/* =========================
-   DATE
-========================= */
-
-function formatDate(
-  dateString
-) {
-
-  if (!dateString) {
-    return "";
-  }
-
-
-  const date =
-    new Date(
-      `${dateString}T12:00:00`
-    );
-
-
-  return date.toLocaleDateString(
-    "it-IT",
-    {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    }
-  );
-
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.timeout);
+  showToast.timeout = setTimeout(() => toast.classList.remove("show"), 2800);
 }
 
-
-/* =========================
-   UTILITY
-========================= */
-
-function normalizeCity(
-  value = ""
-) {
-
-  return value
-    .trim()
-    .toLowerCase();
-
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-
-function capitalize(
-  value = ""
-) {
-
-  if (!value) {
-    return "";
-  }
-
-  return (
-    value.charAt(0)
-      .toUpperCase() +
-    value.slice(1)
-  );
-
-}
-
-
-function escapeHtml(
-  value = ""
-) {
-
-  return String(value)
-
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
-}
-
-
-/* =========================
-   BETA FORM
-========================= */
-
-if (betaForm) {
-
-  betaForm.addEventListener(
-    "submit",
-    event => {
-
-      event.preventDefault();
-
-
-      const formData =
-        new FormData(
-          betaForm
-        );
-
-
-      const betaData = {
-
-        name:
-          formData.get("name"),
-
-        email:
-          formData.get("email"),
-
-        city:
-          formData.get("city"),
-
-        type:
-          formData.get("type"),
-
-        createdAt:
-          new Date()
-            .toISOString()
-
-      };
-
-
-      localStorage.setItem(
-        "affitti-smart-beta-demo",
-        JSON.stringify(
-          betaData
-        )
-      );
-
-
-      betaMessage.textContent =
-        "✓ Registrazione demo completata. " +
-        "Il modulo reale verrà collegato " +
-        "al database nella fase successiva.";
-
-
-      betaMessage.style.color =
-        "#0d6b5f";
-
-
-      betaMessage.style.fontWeight =
-        "800";
-
-    }
-  );
-
-}
-
-
-/* =========================
-   CLICK FUORI DAL DIALOG
-========================= */
-
-searchDialog.addEventListener(
-  "click",
-  event => {
-
-    const rect =
-      searchDialog
-        .getBoundingClientRect();
-
-
-    const clickedOutside =
-
-      event.clientX <
-        rect.left ||
-
-      event.clientX >
-        rect.right ||
-
-      event.clientY <
-        rect.top ||
-
-      event.clientY >
-        rect.bottom;
-
-
-    if (clickedOutside) {
-
-      searchDialog.close();
-
-    }
-
-  }
-);
-
-
-/* =========================
-   INIZIALIZZAZIONE
-========================= */
-
-updateDynamicFilters();
-
-updateWizard();
-
-renderSearches();
+renderSavedSearches();
